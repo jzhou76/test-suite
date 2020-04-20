@@ -22,7 +22,6 @@ int NumNodes;
 
 
 #include "stdinc.h"
-#include "safe_mm_checked.h"
 
 #define THREEDIM
 #include "vectmath.h"
@@ -86,7 +85,7 @@ typedef struct node{
 
 #define BODY 01                 /* type code for bodies */
 
-typedef mm_ptr<struct bnode> bodyptr;
+typedef struct bnode *bodyptr;
 
 typedef struct bnode {
     short type;
@@ -128,7 +127,7 @@ typedef struct bnode {
 
 #define NSUB (1 << NDIM)        /* subcells per cell */
 
-typedef mm_ptr<struct cnode> cellptr;
+typedef struct cnode *cellptr; 
 
 typedef struct cnode {
     short type;
@@ -158,9 +157,7 @@ typedef struct {
   nodeptr root;
   bodyptr bodytab[MAX_NUM_NODES];
   bodyptr bodiesperproc[MAX_NUM_NODES];
-} tree;
-
-typedef mm_ptr<tree> treeptr;
+} tree, *treeptr;
 
 #define Root(t) ((t)->root)
 #define Rmin(t) ((t)->rmin)

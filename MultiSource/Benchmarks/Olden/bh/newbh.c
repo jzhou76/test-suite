@@ -11,7 +11,7 @@
 
 #include "defs.h"
 #include "code.h"
-#include "safe_mm_checked.h"
+
 
 int nbody;
 
@@ -35,10 +35,10 @@ typedef struct {
 } datapoints;
 
 
-bodyptr testdata(void);
+bodyptr testdata();
 datapoints uniform_testdata(int proc, int nbody, int seedfactor);
 void stepsystem(treeptr t, int nstep);
-treeptr old_main(void);
+treeptr old_main();
 void my_free(nodeptr n);
 bodyptr ubody_alloc(int p);
 bodyptr movebodies(bodyptr list, int proc);
@@ -53,33 +53,36 @@ int arg1;
 
 /* Used to setup runtime system, get arguments-- see old_main */
 int main(int argc, char **argv) {
+  treeptr t;
+
   /* Initialize the runtime system */
   dealwithargs(argc, argv);
   chatting("nbody = %d, numnodes = %d\n", nbody, NumNodes);
 
-  treeptr t = old_main();
+  t = old_main();
   return 0;
 }
 
 /* global! */
 
 /* Main routine from original program */
-treeptr old_main(void) {
+treeptr old_main() {
   real tnow;
   real tout;
   int i, nsteps, nprocs;
-  bodyptr bt0 = NULL, p = NULL;
+  treeptr t;
+  bodyptr bt0,p;
   long t1, t2;
   vector cmr, cmv;
-  bodyptr prev = NULL;
+  bodyptr prev=NULL;
   int tmp=0, range=((1<<NDIM) << NDIM) / NumNodes;
   int bodiesper[MAX_NUM_NODES];
-  bodyptr ptrper[MAX_NUM_NODES] = {NULL};
+  bodyptr ptrper[MAX_NUM_NODES];
 
   srand(123);					/*   set random generator   */
 
 /* Tree data structure is global, points to root, and bodylist, has size info */
-  treeptr t = mm_alloc<tree>(sizeof(tree));
+  t = (treeptr)malloc(sizeof(tree));
   Root(t) = NULL;
   t->rmin[0] = -2.0;
   t->rmin[1] = -2.0;
@@ -188,11 +191,11 @@ treeptr old_main(void) {
 #define MFRAC  0.999		/* mass cut off at MFRAC of total */
 
 /* don't use this unless it is fixed on random numbers, &c */
-bodyptr testdata(void)
+bodyptr testdata()
 {
     real rsc, vsc, r, v, x, y;
     vector cmr, cmv;
-    bodyptr head = NULL, p = NULL, prev = NULL;
+    bodyptr head, p, prev;
     register int i;
     double temp, t1;
     double seed = 123.0;
@@ -279,7 +282,7 @@ bodyptr testdata(void)
 extern int EventCount;
 
 void stepsystem(treeptr t, int nstep) {
-  bodyptr bt = NULL, bt0 = NULL, q = NULL;
+  bodyptr bt, bt0, q;
   int i;
   nodeptr root;
 
@@ -353,13 +356,12 @@ void my_free(nodeptr n)
     cp_free_list = n;
   }
 }
-
+    
 
 bodyptr ubody_alloc(int p)
-{
-  register bodyptr tmp = NULL;
+{ register bodyptr tmp;
 
-  tmp = mm_alloc<body>(sizeof(body));
+  tmp = (bodyptr)malloc(sizeof(body));
 
   Type(tmp) = BODY;
   Proc(tmp) = p;
@@ -398,7 +400,7 @@ datapoints uniform_testdata(int proc, int nbodyx, int seedfactor)
 {
   datapoints retval;
   real rsc, vsc, r, v, x, y;
-  bodyptr head = NULL, p = NULL, prev = NULL;
+  bodyptr head, p, prev;
   register int i;
   double temp, t1;
   double seed = 123.0 * (double) seedfactor;
@@ -506,7 +508,7 @@ void computegrav(treeptr t, int nstep)
    real rsize;
    real dthf;
    nodeptr root;
-   bodyptr blist = NULL;
+   bodyptr blist;
 
    /* loop over particles   */
    rsize = Rsize(t);
@@ -523,7 +525,7 @@ void computegrav(treeptr t, int nstep)
 
 void grav(real rsize, nodeptr rt, bodyptr bodies, int nstep, real dthf)
 {
-  register bodyptr p = NULL, q = NULL;
+  register bodyptr p, q;
   int i=0;
 
 
@@ -784,7 +786,7 @@ void dis_number (nodeptr n);
 
 nodeptr maketree(bodyptr btab, int nb, treeptr t, int nsteps, int proc)
 {  
-  register bodyptr q = NULL;
+  register bodyptr q;
   int tmp;
   nodeptr node1;
   icstruct xqic;
@@ -834,7 +836,7 @@ void expandbox(bodyptr p, treeptr t, int nsteps, int proc)
     icstruct ic;
     int k;
     vector rmid;
-    cellptr  newt = NULL;
+    cellptr  newt;
     tree tmp;
     real rsize;
     int inbox;
