@@ -10,3 +10,6 @@ else()
   endif()
 endif()
 llvm_multisource(bh)
+
+# Checked C header files.
+include_directories(../../../../../../misc/include)
