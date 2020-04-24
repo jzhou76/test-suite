@@ -12,4 +12,8 @@ endif()
 llvm_multisource(bh)
 
 # Checked C header files.
-include_directories(../../../../../../misc/include)
+find_path(SAFEMM_HEADER safe_mm_checked.h)
+target_include_directories(bh PUBLIC ${SAFEMM_HEADER})
+# Checked C library
+find_library(LIB_SAFEMM safemm)
+target_link_libraries(bh ${LIB_SAFEMM})
