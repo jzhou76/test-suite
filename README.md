@@ -25,11 +25,11 @@
    ```
    # Checked C header files
    find_path(SAFEMM_HEADER safe_mm_checked.h)
-    target_include_directories(bh PUBLIC ${SAFEMM_HEADER})
-    # Checked C library
-    find_library(LIB_SAFEMM safemm)
-    target_link_libraries(bh ${LIB_SAFEMM})
-    ```
+   target_include_directories(bh PUBLIC ${SAFEMM_HEADER})
+   # Checked C library
+   find_library(LIB_SAFEMM safemm)
+   target_link_libraries(bh ${LIB_SAFEMM})
+   ```
 5. `make $(PROG)` (e.g., `make bh`)
 
 ### Run
