@@ -29,6 +29,7 @@ int NumNodes;
 #define MAX_NUM_NODES 64
 extern double fabs();
 
+#include "safe_mm_checked.h"
 
 /*
  * BODY and CELL data structures are used to represent the tree:
@@ -100,8 +101,8 @@ typedef struct bnode {
     vector acc;			/* acceleration of body */
     vector new_acc;
     real phi;			/* potential at body */
-    bodyptr next;              /* pointer to next point */
-    bodyptr proc_next;              /* pointer to next point */
+    mm_ptr<struct bnode> next;              /* pointer to next point */
+    mm_ptr<struct bnode> proc_next;              /* pointer to next point */
 } body;
 
 /***
@@ -155,8 +156,8 @@ typedef struct {
   real rmin[3];               
   real rsize;
   nodeptr root;
-  bodyptr bodytab[MAX_NUM_NODES];
-  bodyptr bodiesperproc[MAX_NUM_NODES];
+  mm_ptr<body> bodytab[MAX_NUM_NODES];
+  mm_ptr<body> bodiesperproc[MAX_NUM_NODES];
 } tree, *treeptr;
 
 #define Root(t) ((t)->root)

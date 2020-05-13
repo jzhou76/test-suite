@@ -17,30 +17,30 @@ int nbody;
 
 double sqrt(), xrand(), my_rand();
 real pow();
-extern icstruct intcoord(bodyptr p, treeptr t);
+extern icstruct intcoord(mm_ptr<body> p, mm_ptr<tree> t);
 extern int BhDebug;
 
-void computegrav(treeptr t, int nstep);
-nodeptr maketree(bodyptr btab, int nbody, treeptr t, int nsteps, int proc);
-void vp(bodyptr q, int nstep);
+void computegrav(mm_ptr<tree> t, int nstep);
+nodeptr maketree(mm_ptr<body> btab, int nbody, mm_ptr<tree> t, int nsteps, int proc);
+void vp(mm_ptr<body> q, int nstep);
 
-void gravstep(real rsize, nodeptr rt, bodyptr p, int nstep, real dthf);
+void gravstep(real rsize, nodeptr rt, mm_ptr<body> p, int nstep, real dthf);
 void ptree(nodeptr n, int level);
 
 typedef struct {
 	vector cmr;
 	vector cmv;
-	bodyptr list;
-   bodyptr tail;
+	mm_ptr<body> list;
+    mm_ptr<body> tail;
 } datapoints;
 
 
-bodyptr testdata();
+mm_ptr<body> testdata();
 datapoints uniform_testdata(int proc, int nbody, int seedfactor);
-void stepsystem(treeptr t, int nstep);
-treeptr old_main();
+void stepsystem(mm_ptr<tree> t, int nstep);
+mm_ptr<tree> old_main();
 void my_free(nodeptr n);
-bodyptr ubody_alloc(int p);
+mm_ptr<body> ubody_alloc(int p);
 bodyptr movebodies(bodyptr list, int proc);
 void freetree(nodeptr n);
 void freetree1(nodeptr n);
@@ -53,7 +53,8 @@ int arg1;
 
 /* Used to setup runtime system, get arguments-- see old_main */
 int main(int argc, char **argv) {
-  treeptr t;
+  /* treeptr t; */
+  mm_ptr<tree> t = NULL;
 
   /* Initialize the runtime system */
   dealwithargs(argc, argv);
@@ -66,23 +67,25 @@ int main(int argc, char **argv) {
 /* global! */
 
 /* Main routine from original program */
-treeptr old_main() {
+mm_ptr<tree> old_main() {
   real tnow;
   real tout;
   int i, nsteps, nprocs;
-  treeptr t;
-  bodyptr bt0,p;
+  /* treeptr t; */
+  mm_ptr<tree> t = NULL;
+  mm_ptr<body> bt0 = NULL, p = NULL;
   long t1, t2;
   vector cmr, cmv;
-  bodyptr prev=NULL;
+  mm_ptr<body> prev=NULL;
   int tmp=0, range=((1<<NDIM) << NDIM) / NumNodes;
   int bodiesper[MAX_NUM_NODES];
-  bodyptr ptrper[MAX_NUM_NODES];
+  mm_ptr<body> ptrper[MAX_NUM_NODES] = { NULL };
 
   srand(123);					/*   set random generator   */
 
 /* Tree data structure is global, points to root, and bodylist, has size info */
-  t = (treeptr)malloc(sizeof(tree));
+  /* t = (treeptr)malloc(sizeof(tree)); */
+  t = mm_alloc<tree>(sizeof(tree));
   Root(t) = NULL;
   t->rmin[0] = -2.0;
   t->rmin[1] = -2.0;
@@ -191,11 +194,11 @@ treeptr old_main() {
 #define MFRAC  0.999		/* mass cut off at MFRAC of total */
 
 /* don't use this unless it is fixed on random numbers, &c */
-bodyptr testdata()
+mm_ptr<body> testdata()
 {
     real rsc, vsc, r, v, x, y;
     vector cmr, cmv;
-    bodyptr head, p, prev;
+    mm_ptr<body> head = NULL, p = NULL, prev = NULL;
     register int i;
     double temp, t1;
     double seed = 123.0;
@@ -208,7 +211,7 @@ bodyptr testdata()
     vsc = sqrt(1.0 / rsc);			/* and recip. speed scale   */
     CLRV(cmr);					/* init cm pos, vel         */
     CLRV(cmv);
-    head = (bodyptr) ubody_alloc(0);
+    head = ubody_alloc(0);
     prev = head;
 
     for (i = 0; i < nbody; i++) {	        /* loop over particles      */
@@ -281,8 +284,8 @@ bodyptr testdata()
  */
 extern int EventCount;
 
-void stepsystem(treeptr t, int nstep) {
-  bodyptr bt, bt0, q;
+void stepsystem(mm_ptr<tree> t, int nstep) {
+  mm_ptr<body> bt = NULL; // bt0, q;
   int i;
   nodeptr root;
 
@@ -358,10 +361,10 @@ void my_free(nodeptr n)
 }
     
 
-bodyptr ubody_alloc(int p)
-{ register bodyptr tmp;
+mm_ptr<body> ubody_alloc(int p)
+{ register mm_ptr<body> tmp = NULL;
 
-  tmp = (bodyptr)malloc(sizeof(body));
+  tmp = mm_alloc<body>(sizeof(body));
 
   Type(tmp) = BODY;
   Proc(tmp) = p;
@@ -400,7 +403,7 @@ datapoints uniform_testdata(int proc, int nbodyx, int seedfactor)
 {
   datapoints retval;
   real rsc, vsc, r, v, x, y;
-  bodyptr head, p, prev;
+  mm_ptr<body> head = NULL, p = NULL, prev = NULL;
   register int i;
   double temp, t1;
   double seed = 123.0 * (double) seedfactor;
@@ -414,7 +417,7 @@ datapoints uniform_testdata(int proc, int nbodyx, int seedfactor)
   vsc = sqrt(1.0 / rsc);			/* and recip. speed scale   */
   CLRV(retval.cmr);					/* init cm pos, vel         */
   CLRV(retval.cmv);
-  head = (bodyptr) ubody_alloc(proc);
+  head = ubody_alloc(proc);
   prev = head;
 
   for (i = 0; i < nbodyx; i++) {	        /* loop over particles      */
@@ -489,7 +492,7 @@ datapoints uniform_testdata(int proc, int nbodyx, int seedfactor)
 /*extern int NumNodes;*/
 
 typedef struct {
-  bodyptr pskip;		/* body to skip in force evaluation */
+  mm_ptr<body> pskip;		/* body to skip in force evaluation */
   vector pos0;			/* point at which to evaluate field */
   real phi0;			/* computed potential at pos0       */
   vector acc0;			/* computed acceleration at pos0    */
@@ -499,16 +502,16 @@ hgstruct gravsub(nodeptr p, hgstruct hg);
 hgstruct walksub(nodeptr p, real dsq, real tolsq, hgstruct hg, int level);
 bool subdivp(nodeptr p, real dsq, real tolsq, hgstruct hg);
 double sqrt(double arg);
-void grav(real rsize, nodeptr rt, bodyptr q, int nstep, real dthf);
-void vp(bodyptr q, int nstep);
-void hackgrav(bodyptr p, real rsize, nodeptr rt);
+void grav(real rsize, nodeptr rt, mm_ptr<body> q, int nstep, real dthf);
+void vp(mm_ptr<body> q, int nstep);
+void hackgrav(mm_ptr<body> p, real rsize, nodeptr rt);
 
-void computegrav(treeptr t, int nstep)
+void computegrav(mm_ptr<tree> t, int nstep)
 {  register int i;
    real rsize;
    real dthf;
    nodeptr root;
-   bodyptr blist;
+   mm_ptr<body> blist = NULL;
 
    /* loop over particles   */
    rsize = Rsize(t);
@@ -523,15 +526,15 @@ void computegrav(treeptr t, int nstep)
 }
 
 
-void grav(real rsize, nodeptr rt, bodyptr bodies, int nstep, real dthf)
+void grav(real rsize, nodeptr rt, mm_ptr<body> bodies, int nstep, real dthf)
 {
-  register bodyptr p, q;
+  register mm_ptr<body> p = NULL, q = NULL;
   int i=0;
 
 
   /* get it to move to the right processor! */
   if (bodies!= NULL) {
-    bodyptr foo = bodies;
+    mm_ptr<body> foo = bodies;
   }
   q = bodies;
 
@@ -547,7 +550,7 @@ void grav(real rsize, nodeptr rt, bodyptr bodies, int nstep, real dthf)
 
 }
 
-void vp(bodyptr q, int nstep)
+void vp(mm_ptr<body> q, int nstep)
 {
   real dthf;
   vector acc1, dacc, dvel, vel1, dpos;
@@ -556,7 +559,7 @@ void vp(bodyptr q, int nstep)
 
   /* move to the correct processor */
   if (q!= NULL) {
-    bodyptr foo = q;
+    mm_ptr<body> foo = q;
   }
 
   NOTEST();
@@ -636,7 +639,7 @@ void vp(bodyptr q, int nstep)
   
 /*
  */
-void gravstep(real rsize, nodeptr rt, bodyptr p, int nstep, real dthf)
+void gravstep(real rsize, nodeptr rt, mm_ptr<body> p, int nstep, real dthf)
 {
 
   hackgrav(p, rsize, rt);			/*   compute new acc for p  */
@@ -647,7 +650,7 @@ void gravstep(real rsize, nodeptr rt, bodyptr p, int nstep, real dthf)
  */
 
 
-void hackgrav(bodyptr p, real rsize, nodeptr rt)
+void hackgrav(mm_ptr<body> p, real rsize, nodeptr rt)
 {
   hgstruct hg;
   real szsq;
@@ -753,7 +756,7 @@ hgstruct gravsub(nodeptr p, hgstruct hg)
 double ceil();
 
 bodyptr body_alloc(int p, real p0, real p1, real p2, real v0, real v1, real v2, real a0, real a1, real a2, real mass, bodyptr ob);
-bodyptr ubody_alloc(int p);
+mm_ptr<body> ubody_alloc(int p);
 cellptr cell_alloc(int p);
 
 typedef struct {
@@ -768,12 +771,12 @@ typedef struct {
 } dt1struct;
 
 
-nodeptr loadtree(bodyptr p, icstruct xpic, nodeptr t, int l, treeptr tr);
-void expandbox(bodyptr p, treeptr t, int nsteps, int proc);
-icstruct intcoord1(double rp0, double rp1, double rp2,  treeptr t);
-icstruct intcoord(bodyptr p,  treeptr t);
-int ic_test(bodyptr p, treeptr t);
-int subindex(bodyptr p, treeptr t, int l);
+nodeptr loadtree(mm_ptr<body> p, icstruct xpic, nodeptr t, int l, mm_ptr<tree> tr);
+void expandbox(mm_ptr<body> p, mm_ptr<tree> t, int nsteps, int proc);
+icstruct intcoord1(double rp0, double rp1, double rp2,  mm_ptr<tree> t);
+icstruct intcoord(mm_ptr<body> p,  mm_ptr<tree> t);
+int ic_test(mm_ptr<body> p, mm_ptr<tree> t);
+int subindex(bodyptr p, mm_ptr<tree> t, int l);
 real hackcofm(nodeptr q);
 
 
@@ -784,9 +787,9 @@ void dis_number (nodeptr n);
  *  MAKETREE: initialize tree structure for hack force calculation.
  */
 
-nodeptr maketree(bodyptr btab, int nb, treeptr t, int nsteps, int proc)
+nodeptr maketree(mm_ptr<body> btab, int nb, mm_ptr<tree> t, int nsteps, int proc)
 {  
-  register bodyptr q;
+  register mm_ptr<body> q = NULL;
   int tmp;
   nodeptr node1;
   icstruct xqic;
@@ -831,7 +834,7 @@ nodeptr maketree(bodyptr btab, int nb, treeptr t, int nsteps, int proc)
  * t - tree 
  */
 
-void expandbox(bodyptr p, treeptr t, int nsteps, int proc)       
+void expandbox(mm_ptr<body> p, mm_ptr<tree> t, int nsteps, int proc)       
 {
     icstruct ic;
     int k;
@@ -895,7 +898,7 @@ void expandbox(bodyptr p, treeptr t, int nsteps, int proc)
  * l - current level in tree 
  */
 
-nodeptr loadtree(bodyptr p, icstruct xpic, nodeptr t, int l, treeptr tr)
+nodeptr loadtree(mm_ptr<body> p, icstruct xpic, nodeptr t, int l, mm_ptr<tree> tr)
 {
   int si;
   cellptr c;
@@ -903,7 +906,7 @@ nodeptr loadtree(bodyptr p, icstruct xpic, nodeptr t, int l, treeptr tr)
 
   if (t == NULL)
      {
-      return ((nodeptr) p);
+      return ((nodeptr) _getptr_mm<body>(p));
      }
   else {
     assert(l != 0, 2);				/*   dont run out of bits   */
@@ -934,7 +937,7 @@ nodeptr loadtree(bodyptr p, icstruct xpic, nodeptr t, int l, treeptr tr)
  * Returns: TRUE unless rp was out of bounds.
  */
 /* called from expandbox */
-icstruct intcoord1(double rp0, double rp1, double rp2, treeptr t)
+icstruct intcoord1(double rp0, double rp1, double rp2, mm_ptr<tree> t)
 {
     double xsc, floor();
     /*double rmin,rsize;*/
@@ -982,7 +985,7 @@ icstruct intcoord1(double rp0, double rp1, double rp2, treeptr t)
  * Returns: TRUE unless rp was out of bounds.
  */
 
-icstruct intcoord(bodyptr p, treeptr t)
+icstruct intcoord(mm_ptr<body> p, mm_ptr<tree> t)
 {
     register double xsc;
     double floor();
@@ -1032,7 +1035,7 @@ icstruct intcoord(bodyptr p, treeptr t)
 }
 
 
-int ic_test(bodyptr p, treeptr t)
+int ic_test(mm_ptr<body> p, mm_ptr<tree> t)
 {
     double xsc, rsize, floor();
     int result;
@@ -1079,7 +1082,7 @@ int ic_test(bodyptr p, treeptr t)
  * SUBINDEX: determine which subcell to select.  Rolled intcoord & subindex together.
  */
 
-int subindex(bodyptr p, treeptr t , int l)
+int subindex(bodyptr p, mm_ptr<tree> t , int l)
 {
     register int i, k;
     register real rsize;
