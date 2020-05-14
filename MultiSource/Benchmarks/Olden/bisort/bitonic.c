@@ -18,7 +18,7 @@ int flag=0,foo=0;
 
 #define LocalNewNode(h,v) \
 { \
-    h = (HANDLE *) malloc(sizeof(struct node)); \
+    h =  mm_alloc<HANDLE>(sizeof(struct node)); \
       h->value = v; \
 	h->left = NIL; \
 	  h->right = NIL; \
@@ -26,8 +26,8 @@ int flag=0,foo=0;
 
 #define NewNode(h,v,procid) LocalNewNode(h,v)
 
-void InOrder(HANDLE *h) {
-  HANDLE *l, *r;
+void InOrder(mm_ptr<HANDLE> h) {
+  mm_ptr<HANDLE> l = NULL, r = NULL;
   if ((h != NIL)) {
     l = h->left;
     r = h->right;
@@ -57,10 +57,10 @@ int random(int seed) {
   return mult(seed,CONST_b)+1;
 }
 
-HANDLE* RandTree(int n, int seed, int node, int level) {
+mm_ptr<HANDLE> RandTree(int n, int seed, int node, int level) {
   int next_val,my_name;
   future_cell_int f_left, f_right;
-  HANDLE *h;
+  mm_ptr<HANDLE> h = NULL;
   my_name=foo++;
   if (n > 1) {
     int newnode;
@@ -82,7 +82,7 @@ HANDLE* RandTree(int n, int seed, int node, int level) {
   return h;
 }
 
-void SwapValue(HANDLE *l, HANDLE *r) {
+void SwapValue(mm_ptr<HANDLE> l, mm_ptr<HANDLE> r) {
   int temp,temp2;
   
   temp = l->value;
@@ -95,10 +95,10 @@ void
 /***********/
 SwapValLeft(l,r,ll,rl,lval,rval)
 /***********/
-HANDLE *l;
-HANDLE *r;
-HANDLE *ll;
-HANDLE *rl;
+mm_ptr<HANDLE> l;
+mm_ptr<HANDLE> r;
+mm_ptr<HANDLE> ll;
+mm_ptr<HANDLE> rl;
 int lval, rval;
 {
   r->value = lval;
@@ -112,10 +112,10 @@ void
 /************/
 SwapValRight(l,r,lr,rr,lval,rval)
 /************/
-HANDLE *l;
-HANDLE *r;
-HANDLE *lr;
-HANDLE *rr;
+mm_ptr<HANDLE> l;
+mm_ptr<HANDLE> r;
+mm_ptr<HANDLE> lr;
+mm_ptr<HANDLE> rr;
 int lval, rval;
 {  
   r->value = lval;
@@ -129,15 +129,15 @@ int
 /********************/
 Bimerge(root,spr_val,dir)
 /********************/
-HANDLE *root;
+mm_ptr<HANDLE> root;
 int spr_val,dir;
 
 { int rightexchange;
   int elementexchange;
-  HANDLE *pl,*pll,*plr;
-  HANDLE *pr,*prl,*prr;
-  HANDLE *rl;
-  HANDLE *rr;
+  mm_ptr<HANDLE> pl = NULL, pll = NULL, plr = NULL;
+  mm_ptr<HANDLE> pr = NULL, prl = NULL, prr = NULL;
+  mm_ptr<HANDLE> rl = NULL;
+  mm_ptr<HANDLE> rr = NULL;
   int rv,lv;
 
 
@@ -204,11 +204,11 @@ int
 /*******************/
 Bisort(root,spr_val,dir)
 /*******************/
-HANDLE *root;
+mm_ptr<HANDLE> root;
 int spr_val,dir;
 
-{ HANDLE *l;
-  HANDLE *r;
+{ mm_ptr<HANDLE> l = NULL;
+  mm_ptr<HANDLE> r = NULL;
   int val;
   /*printf("bisort %x\n", root);*/
   if ((root->left == NIL))  /* <---- 8.7% load penalty */
@@ -237,7 +237,7 @@ int spr_val,dir;
 } 
 
 int main(int argc, char **argv) {
-  HANDLE *h;
+  mm_ptr<HANDLE> h = NULL;
   int sval;
   int n;
    

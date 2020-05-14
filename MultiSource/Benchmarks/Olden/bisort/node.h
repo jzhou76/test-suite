@@ -2,18 +2,24 @@
 
 /* =============== NODE STRUCTURE =================== */
 
-struct node { 
-  int value;
-  struct node *left;
-  struct node *right;
-};
+#include "safe_mm_checked.h"
 
 typedef struct node HANDLE;
 
+struct node { 
+  int value;
+  mm_ptr<HANDLE> left;
+  mm_ptr<HANDLE> right;
+};
+
+
 typedef struct future_cell_int{
-  HANDLE *value;
+  mm_ptr<HANDLE> value;
 } future_cell_int;
 
 extern void *malloc(unsigned);
 
+#if 0
 #define NIL ((HANDLE *) 0)
+#endif
+#define NIL NULL

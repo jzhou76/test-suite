@@ -2,8 +2,9 @@
 
 /* ========== PROCEDURE TYPES/NUMS ================== */
 
+#include "safe_mm_checked.h"
 
-HANDLE *RandTree();
+mm_ptr<HANDLE> RandTree();
 
 void SwapValue();
 void SwapValLeft();
