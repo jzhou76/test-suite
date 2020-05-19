@@ -11,3 +11,10 @@ else()
   endif()
 endif()
 llvm_multisource(health)
+
+# Checked C header files
+find_path(SAFEMM_HEADER safe_mm_checked.h)
+target_include_directories(health PUBLIC ${SAFEMM_HEADER})
+# Checked C library
+find_library(LIB_SAFEMM safemm)
+target_link_libraries(health ${LIB_SAFEMM})

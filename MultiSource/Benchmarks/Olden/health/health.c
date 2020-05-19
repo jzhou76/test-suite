@@ -14,15 +14,21 @@ int  max_level;
 long max_time;
 long long seed;
 
-struct Village *alloc_tree(int level, int label, struct Village *back) {
-  if (level == 0)
-    return NULL;
-  else {
-    struct Village       *new;
-    int                  i;
-    struct Village       *fval[4];
+mm_ptr<struct Village>
+alloc_tree(int level, int label, mm_ptr<struct Village> back) {
+  /* sz: Temporary walk around for return NULL */
+  mm_ptr<struct Village> new = NULL;
 
-    new = (struct Village *)malloc(sizeof(struct Village));
+  if (level == 0)
+    return new;
+  else {
+    int i;
+#if 0
+    mm_ptr<struct Village> new = NULL;
+#endif
+    mm_ptr<struct Village> fval[4] = {NULL};
+
+    new = mm_alloc<struct Village>(sizeof(struct Village));
 
     for (i = 3; i >= 0; i--)
       fval[i] = alloc_tree(level - 1, label*4 + i + 1, new); 
@@ -56,7 +62,7 @@ struct Village *alloc_tree(int level, int label, struct Village *back) {
 }
 
 
-struct Results get_results(struct Village *village) {
+struct Results get_results(mm_ptr<struct Village> village) {
   int                    i;
   struct List            *list;
   struct Patient         *p;
@@ -70,7 +76,7 @@ struct Results get_results(struct Village *village) {
   if (village == NULL) return r1;
 
   for (i = 3; i > 0; i--) {
-    struct Village *V = village->forward[i];
+    mm_ptr<struct Village> V = village->forward[i];
     fval[i] = get_results(V);
   }
 
@@ -94,7 +100,7 @@ struct Results get_results(struct Village *village) {
   return r1; 
 }
 
-void check_patients_inside(struct Village *village, struct List *list) 
+void check_patients_inside(mm_ptr<struct Village> village, struct List *list)
 {
   struct List            *l;
   struct Patient         *p;
@@ -115,7 +121,8 @@ void check_patients_inside(struct Village *village, struct List *list)
   } 
 }
 
-struct List *check_patients_assess(struct Village *village, struct List *list) {
+struct List *check_patients_assess(mm_ptr<struct Village> village,
+                                   struct List *list) {
   float rand;
   struct Patient *p;
   struct List *up = NULL;
@@ -153,7 +160,7 @@ struct List *check_patients_assess(struct Village *village, struct List *list) {
   return up;
 }
 
-void check_patients_waiting(struct Village *village, struct List *list) {
+void check_patients_waiting(mm_ptr<struct Village> village, struct List *list) {
   int i, t;
   struct Patient *p;
   
@@ -192,7 +199,7 @@ void put_in_hosp(struct Hosp *hosp, struct Patient *patient) {
   }
 }
 
-struct Patient *generate_patient(struct Village *village) 
+struct Patient *generate_patient(mm_ptr<struct Village> village)
 {
   long long       s,newseed;
   struct Patient *patient;
@@ -218,7 +225,7 @@ struct Patient *generate_patient(struct Village *village)
 int main(int argc, char *argv[]) 
 { 
   struct Results         results;
-  struct Village         *top = 0;
+  mm_ptr<struct Village> top = NULL;
   int                    i;
   float total_time, total_patients, total_hosps;  
   
@@ -251,7 +258,7 @@ int main(int argc, char *argv[])
 }
 
 
-struct List *sim(struct Village *village)
+struct List *sim(mm_ptr<struct Village> village)
 {
   int                    i;
   struct Patient         *patient;
@@ -265,7 +272,7 @@ struct List *sim(struct Village *village)
   label = village->label;
 
   for (i = 3; i > 0; i--) {
-    struct Village *V = village->forward[i];
+    mm_ptr<struct Village> V = village->forward[i];
     struct List *L = sim(V);
     val[i] = L;
   }

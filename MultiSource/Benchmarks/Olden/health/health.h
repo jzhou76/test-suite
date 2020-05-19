@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "safe_mm_checked.h"
+
 #define chatting printf
 
 #define IA 16807
@@ -34,7 +36,7 @@ struct Patient {
   int                    hosps_visited;
   int                    time;
   int                    time_left;
-  struct Village         *home_village;
+  mm_ptr<struct Village> home_village;
 };
 
 struct List {
@@ -65,8 +67,8 @@ struct Hosp {
  
 struct Village {
 #if 1
-  struct Village         *forward[4];
-  struct Village         *back;
+  mm_ptr<struct Village> forward[4];
+  mm_ptr<struct Village> back;
   struct List            returned;
   struct Hosp            hosp;   
   int                    label;
@@ -74,28 +76,30 @@ struct Village {
 #else
   struct Hosp            hosp;   
   long                   seed;
-  struct Village         *forward[4];
+  mm_ptr<struct Village> forward[4];
   int                    label;
   struct List            returned;
-  struct Village         *back;
+  mm_ptr<struct Village> back;
 #endif
 };
 
-struct Village *alloc_tree(int level, int label, struct Village *back);
+mm_ptr<struct Village>
+alloc_tree(int level, int label, mm_ptr<struct Village> back);
 void dealwithargs(int argc, char *argv[]);
 float my_rand(long long idum);
-struct Patient *generate_patient(struct Village *village);
+struct Patient *generate_patient(mm_ptr<struct Village> village);
 void put_in_hosp(struct Hosp *hosp, struct Patient *patient);
 void addList(struct List *list, struct Patient *patient);
 void removeList(struct List *list, struct Patient *patient);
-struct List *sim(struct Village *village);
-void check_patients_inside(struct Village *village, struct List *list);
-struct List *check_patients_assess(struct Village *village, struct List *list);
-void check_patients_waiting(struct Village *village, struct List *list);
-float get_num_people(struct Village *village);
-float get_total_time(struct Village *village);
-float get_total_hosps(struct Village *village);
-struct Results get_results(struct Village *village);
+struct List *sim(mm_ptr<struct Village> village);
+void check_patients_inside(mm_ptr<struct Village> village, struct List *list);
+struct List *check_patients_assess(mm_ptr<struct Village> village,
+                                   struct List *list);
+void check_patients_waiting(mm_ptr<struct Village> village, struct List *list);
+float get_num_people(mm_ptr<struct Village> village);
+float get_total_time(mm_ptr<struct Village> village);
+float get_total_hosps(mm_ptr<struct Village> village);
+struct Results get_results(mm_ptr<struct Village> village);
 
 #endif
 
