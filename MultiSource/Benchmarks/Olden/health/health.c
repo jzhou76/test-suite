@@ -65,7 +65,7 @@ alloc_tree(int level, int label, mm_ptr<struct Village> back) {
 struct Results get_results(mm_ptr<struct Village> village) {
   int                    i;
   struct List            *list;
-  struct Patient         *p;
+  mm_ptr<struct Patient> p = NULL;
   struct Results         fval[4];
   struct Results         r1;
 
@@ -103,8 +103,8 @@ struct Results get_results(mm_ptr<struct Village> village) {
 void check_patients_inside(mm_ptr<struct Village> village, struct List *list)
 {
   struct List            *l;
-  struct Patient         *p;
-  int                     t;
+  mm_ptr<struct Patient> p = NULL;
+  int                    t;
   
   while (list != NULL) {
     p = list->patient;
@@ -124,7 +124,7 @@ void check_patients_inside(mm_ptr<struct Village> village, struct List *list)
 struct List *check_patients_assess(mm_ptr<struct Village> village,
                                    struct List *list) {
   float rand;
-  struct Patient *p;
+  mm_ptr<struct Patient> p = NULL;
   struct List *up = NULL;
   long long s;
   int label, t;
@@ -162,7 +162,7 @@ struct List *check_patients_assess(mm_ptr<struct Village> village,
 
 void check_patients_waiting(mm_ptr<struct Village> village, struct List *list) {
   int i, t;
-  struct Patient *p;
+  mm_ptr<struct Patient> p = NULL;
   
   while (list != NULL) {
     i = village->hosp.free_personnel;
@@ -183,7 +183,7 @@ void check_patients_waiting(mm_ptr<struct Village> village, struct List *list) {
 }
 
 
-void put_in_hosp(struct Hosp *hosp, struct Patient *patient) {
+void put_in_hosp(struct Hosp *hosp, mm_ptr<struct Patient> patient) {
   int t = patient->hosps_visited;
 
   patient->hosps_visited = t + 1;
@@ -199,10 +199,10 @@ void put_in_hosp(struct Hosp *hosp, struct Patient *patient) {
   }
 }
 
-struct Patient *generate_patient(mm_ptr<struct Village> village)
+mm_ptr<struct Patient> generate_patient(mm_ptr<struct Village> village)
 {
   long long       s,newseed;
-  struct Patient *patient;
+  mm_ptr<struct Patient> patient = NULL;
   float rand;
   int label;
   
@@ -212,14 +212,18 @@ struct Patient *generate_patient(mm_ptr<struct Village> village)
   newseed = village->seed;
   label = village->label;
   if (rand > 0.666) {
-    patient = (struct Patient *)malloc(sizeof(struct Patient));
+    patient = mm_alloc<struct Patient>(sizeof(struct Patient));
     patient->hosps_visited = 0;
     patient->time = 0;
     patient->time_left = 0;
     patient->home_village = village; 
     return patient;
   }
-  return NULL; 
+  /* sz: Temporary walk around for return NULL */
+  return patient;
+#if 0
+  return NULL
+#endif
 }
 
 int main(int argc, char *argv[]) 
@@ -261,7 +265,7 @@ int main(int argc, char *argv[])
 struct List *sim(mm_ptr<struct Village> village)
 {
   int                    i;
-  struct Patient         *patient;
+  mm_ptr<struct Patient> patient = NULL;
   struct List            *l, *up;
   struct Hosp            *h;
   struct List            *val[4];

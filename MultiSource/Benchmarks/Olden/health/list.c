@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "health.h"
 
-void addList(struct List *list, struct Patient *patient) {
+void addList(struct List *list, mm_ptr<struct Patient> patient) {
   struct List *b;
 
   while (list != NULL) {
@@ -23,9 +23,9 @@ void addList(struct List *list, struct Patient *patient) {
   b->forward = list;
 } 
 
-void removeList(struct List *list, struct Patient *patient) {
+void removeList(struct List *list, mm_ptr<struct Patient> patient) {
   struct List          *l1,*l2;
-  struct Patient       *p;
+  mm_ptr<struct Patient> p = NULL;
 
   p = list->patient;
   while(p != patient) {

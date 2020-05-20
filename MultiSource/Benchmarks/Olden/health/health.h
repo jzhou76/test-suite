@@ -41,7 +41,7 @@ struct Patient {
 
 struct List {
   struct List            *forward;
-  struct Patient         *patient;
+  mm_ptr<struct Patient> patient;
   struct List            *back;
 };
 
@@ -87,10 +87,10 @@ mm_ptr<struct Village>
 alloc_tree(int level, int label, mm_ptr<struct Village> back);
 void dealwithargs(int argc, char *argv[]);
 float my_rand(long long idum);
-struct Patient *generate_patient(mm_ptr<struct Village> village);
-void put_in_hosp(struct Hosp *hosp, struct Patient *patient);
-void addList(struct List *list, struct Patient *patient);
-void removeList(struct List *list, struct Patient *patient);
+mm_ptr<struct Patient> generate_patient(mm_ptr<struct Village> village);
+void put_in_hosp(struct Hosp *hosp, mm_ptr<struct Patient> patient);
+void addList(struct List *list, mm_ptr<struct Patient> patient);
+void removeList(struct List *list, mm_ptr<struct Patient> patient);
 struct List *sim(mm_ptr<struct Village> village);
 void check_patients_inside(mm_ptr<struct Village> village, struct List *list);
 struct List *check_patients_assess(mm_ptr<struct Village> village,
