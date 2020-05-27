@@ -35,7 +35,7 @@ double make_orthogonal (double* v_mod, double* v_static);
 
 void Compute_Tree(Root r) {
   int i;
-  Lateral l;
+  Lateral l = NULL;
   Demand a;
   Demand tmp;
   double theta_R,theta_I;
@@ -60,8 +60,8 @@ Demand Compute_Lateral(Lateral l, double theta_R, double theta_I,
   Demand a2;
   double new_pi_R, new_pi_I;
   double a,b,c,root;
-  Lateral next;
-  Branch br;
+  Lateral next = NULL;
+  Branch br = NULL;
   
   new_pi_R = pi_R + l->alpha*(theta_R+(theta_I*l->X)/l->R);
   new_pi_I = pi_I + l->beta*(theta_I+(theta_R*l->R)/l->X);
@@ -103,8 +103,8 @@ Demand Compute_Branch(Branch br, double theta_R, double theta_I,
   Demand a2,tmp;
   double new_pi_R, new_pi_I;
   double a,b,c,root;
-  Leaf l;
-  Branch next;
+  Leaf l = NULL;
+  Branch next = NULL;
   int i;
   Demand a1;
   

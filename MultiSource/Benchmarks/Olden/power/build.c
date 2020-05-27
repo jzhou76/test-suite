@@ -15,10 +15,10 @@
 Root build_tree() 
 {
   int i;
-  Root t;
-  Lateral l;
+  Root t = NULL;
+  Lateral l = NULL;
 
-  t = (Root) malloc(sizeof(*t));
+  t = mm_alloc<struct root>(sizeof(*t));
 
   for (i=0; i<NUM_FEEDERS; i++) {
     /* Insert future here, split into two loops */
@@ -32,12 +32,12 @@ Root build_tree()
 
 Lateral build_lateral(int i, int num)
 {
-  Lateral l;
-  Branch b;
-  Lateral next;
+  Lateral l = NULL;
+  Branch b = NULL;
+  Lateral next = NULL;
  
-  if (num == 0) return NULL;
-  l = (Lateral) malloc(sizeof(*l));
+  if (num == 0) return l;
+  l = mm_alloc<struct lateral>(sizeof(*l));
 
   next = build_lateral(i,num-1);
   b = build_branch(i*BRANCHES_PER_LATERAL,(num-1)*BRANCHES_PER_LATERAL,
@@ -54,12 +54,12 @@ Lateral build_lateral(int i, int num)
 
 Branch build_branch(int i, int j, int num)
 {
-  Leaf l;
-  Branch b;
+  Leaf l = NULL;
+  Branch b = NULL;
 
-  if (num == 0) return NULL;
+  if (num == 0) return b;
   /* allocate branch */
-  b = (Branch) malloc(sizeof(*b));
+  b = mm_alloc<struct branch>(sizeof(*b));
   
   /* fill in children */
   b->next_branch= build_branch(i,j,num-1);
@@ -78,9 +78,9 @@ Branch build_branch(int i, int j, int num)
 }
 
 Leaf build_leaf() {
-  Leaf l;
+  Leaf l = NULL;
 
-  l = (Leaf) malloc(sizeof(*l));
+  l = mm_alloc<struct leaf>(sizeof(*l));
   l->D.P = 1.0;
   l->D.Q = 1.0;
   return l;

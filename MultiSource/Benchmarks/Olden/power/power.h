@@ -12,14 +12,14 @@
  *
  */
 
-void *malloc(unsigned Size);
-
 typedef struct demand {
   double P;
   double Q;
 } Demand;
 
 #include <math.h>
+
+#include "safe_mm_checked.h"
 
 #define NULL 0
 
@@ -54,8 +54,10 @@ typedef struct root {
   Demand last;
   double last_theta_R; 
   double last_theta_I;
-  struct lateral *feeders[NUM_FEEDERS];
-} *Root;  /* sizeof(struct root) = 108 bytes */
+  mm_ptr<struct lateral> feeders[NUM_FEEDERS];
+};  /* sizeof(struct root) = 108 bytes */
+
+typedef mm_ptr<struct root> Root;
 
 typedef struct lateral {
   Demand D;
@@ -63,9 +65,11 @@ typedef struct lateral {
   double beta;
   double R;
   double X;
-  struct lateral *next_lateral;
-  struct branch *branch;
-} *Lateral; /* sizeof(struct lateral) = 64 bytes */
+  mm_ptr<struct lateral> next_lateral;
+  mm_ptr<struct branch> branch;
+}; /* sizeof(struct lateral) = 64 bytes */
+
+typedef mm_ptr<struct lateral> Lateral;
 
 typedef struct branch {
   Demand D;
@@ -73,15 +77,19 @@ typedef struct branch {
   double beta;
   double R;
   double X;
-  struct branch *next_branch;
-  struct leaf *leaves[LEAVES_PER_BRANCH];
-} *Branch; /* sizeof(struct branch) = 92 bytes */
+  mm_ptr<struct branch> next_branch;
+  mm_ptr<struct leaf> leaves[LEAVES_PER_BRANCH];
+}; /* sizeof(struct branch) = 92 bytes */
+
+typedef mm_ptr<struct branch> Branch;
 
 typedef struct leaf {
   Demand D;
   double pi_R;
   double pi_I;
-} *Leaf;  /* sizeof(struct leaf) = 32 bytes */
+};  /* sizeof(struct leaf) = 32 bytes */
+
+typedef mm_ptr<struct leaf> Leaf;
 
 /* Prototypes */
 Root build_tree(void);

@@ -54,7 +54,7 @@ double map_Q[36] =
 
 int main(int argc,char *argv[])
 {
-  Root r;
+  Root r = NULL;
   int i,finished=0;
   double d_theta_R,d_theta_I;
 
