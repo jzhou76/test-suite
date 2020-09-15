@@ -13,20 +13,20 @@ typedef struct {
  * p: pointer into body-tree 
  * dsq: size of box squared 
  */
-extern bool subdivp(nodeptr p, real dsq, real tolsq, hgstruct hg);
-hgstruct walksub(nodeptr p, real dsq, real tolsq, hgstruct hg, int level);
-hgstruct gravsub(nodeptr p, hgstruct hg);
+extern bool subdivp(mm_ptr<node> p, real dsq, real tolsq, hgstruct hg);
+hgstruct walksub(mm_ptr<node> p, real dsq, real tolsq, hgstruct hg, int level);
+hgstruct gravsub(mm_ptr<node> p, hgstruct hg);
 
-hgstruct walksub(nodeptr p, real dsq, real tolsq, hgstruct hg, int level)
+hgstruct walksub(mm_ptr<node> p, real dsq, real tolsq, hgstruct hg, int level)
 {
   register int k, i;
-  register nodeptr r;
+  register mm_ptr<node> r = NULL;
   nodeptr tmp[NSUB];
 
 
   if (subdivp(p, dsq, tolsq, hg)) {           /* should p be opened?    */
     for (k = 0; k < NSUB; k++) {              /* loop over the subcells */
-      r = Subp((cellptr) p)[k]; /* <-- 6.7% load penalty */
+      r = Subp((mm_ptr<cell>) p)[k]; /* <-- 6.7% load penalty */
       if (r != NULL)                  /* does this one exist?   */
 	hg = walksub(r, dsq / 4.0, tolsq, hg, level+1);
     }

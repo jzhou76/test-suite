@@ -139,8 +139,8 @@ typedef struct cnode {
 #ifdef JUMP
     struct node * next_few_node;
 #endif
-    nodeptr subp[NSUB];         /* descendents of cell */
-    cellptr next;               /* for free list */
+    mm_ptr<node> subp[NSUB];         /* descendents of cell */
+    mm_ptr<struct cnode> next;               /* for free list */
 
 } cell;
 
@@ -155,7 +155,7 @@ typedef struct cnode {
 typedef struct {
   real rmin[3];               
   real rsize;
-  nodeptr root;
+  mm_ptr<node> root;
   mm_ptr<body> bodytab[MAX_NUM_NODES];
   mm_ptr<body> bodiesperproc[MAX_NUM_NODES];
 } tree, *treeptr;

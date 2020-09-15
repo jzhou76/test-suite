@@ -21,11 +21,11 @@ extern icstruct intcoord(mm_ptr<body> p, mm_ptr<tree> t);
 extern int BhDebug;
 
 void computegrav(mm_ptr<tree> t, int nstep);
-nodeptr maketree(mm_ptr<body> btab, int nbody, mm_ptr<tree> t, int nsteps, int proc);
+mm_ptr<node> maketree(mm_ptr<body> btab, int nbody, mm_ptr<tree> t, int nsteps, int proc);
 void vp(mm_ptr<body> q, int nstep);
 
-void gravstep(real rsize, nodeptr rt, mm_ptr<body> p, int nstep, real dthf);
-void ptree(nodeptr n, int level);
+void gravstep(real rsize, mm_ptr<node> rt, mm_ptr<body> p, int nstep, real dthf);
+void ptree(mm_ptr<node> n, int level);
 
 typedef struct {
 	vector cmr;
@@ -39,11 +39,11 @@ mm_ptr<body> testdata();
 datapoints uniform_testdata(int proc, int nbody, int seedfactor);
 void stepsystem(mm_ptr<tree> t, int nstep);
 mm_ptr<tree> old_main();
-void my_free(nodeptr n);
+void my_free(mm_ptr<node> n);
 mm_ptr<body> ubody_alloc(int p);
 bodyptr movebodies(bodyptr list, int proc);
-void freetree(nodeptr n);
-void freetree1(nodeptr n);
+void freetree(mm_ptr<node> n);
+void freetree1(mm_ptr<node> n);
 int old_subindex(icstruct ic, int l);
 
 int dealwithargs();
@@ -287,7 +287,7 @@ extern int EventCount;
 void stepsystem(mm_ptr<tree> t, int nstep) {
   mm_ptr<body> bt = NULL; // bt0, q;
   int i;
-  nodeptr root;
+  mm_ptr<node> root = NULL;
 
   int barge,cflctdiff,misstemp,diff;
   /*unsigned long t5, t1, t2, t3, t4; */
@@ -312,7 +312,7 @@ void stepsystem(mm_ptr<tree> t, int nstep) {
 }
 
 
-void freetree1(nodeptr n)
+void freetree1(mm_ptr<node> n)
 {
   unsigned long t1, t2;
   int foo;
@@ -321,9 +321,9 @@ void freetree1(nodeptr n)
 }
 
   
-void freetree(nodeptr n)
+void freetree(mm_ptr<node> n)
 {
-  register nodeptr r;
+  register mm_ptr<node> r = NULL;
   register int i;
   
   /*NOTEST();*/
@@ -332,7 +332,7 @@ void freetree(nodeptr n)
 
   /* Type(n) == CELL */
   for (i=NSUB-1; i >= 0; i--) {
-    r = Subp((cellptr) n)[i];
+    r = Subp((mm_ptr<cell>) n)[i];
     if (r != NULL) {
       freetree(r);
     }
@@ -343,19 +343,19 @@ void freetree(nodeptr n)
 }
 
 
-nodeptr cp_free_list = NULL;
-bodyptr bp_free_list = NULL;
+mm_ptr<node> cp_free_list = NULL;
+mm_ptr<body> bp_free_list = NULL;
 
 
 /* should never be called with NULL */
-void my_free(nodeptr n)
+void my_free(mm_ptr<node> n)
 {
   if (Type(n) == BODY) {
-    Next((bodyptr) n) = bp_free_list;
-    bp_free_list = (bodyptr) n;
+    Next((mm_ptr<body>) n) = bp_free_list;
+    bp_free_list = (mm_ptr<body>) n;
   }
   else /* CELL */ {
-    FL_Next((cellptr) n) = (cellptr) cp_free_list;
+    FL_Next((mm_ptr<cell>) n) = (mm_ptr<cell>) cp_free_list;
     cp_free_list = n;
   }
 }
@@ -375,17 +375,17 @@ mm_ptr<body> ubody_alloc(int p)
 }
 
 
-cellptr cell_alloc(int p)
-{ register cellptr tmp;
+mm_ptr<cell> cell_alloc(int p)
+{ register mm_ptr<cell> tmp = NULL;
   register int i;
 
   if (cp_free_list != NULL) {
-    tmp = (cellptr) cp_free_list;
-    cp_free_list = (nodeptr) FL_Next((cellptr) cp_free_list);
+    tmp = (mm_ptr<cell>) cp_free_list;
+    cp_free_list = (mm_ptr<node>) FL_Next((mm_ptr<cell>) cp_free_list);
   }
   else 
     {
-      tmp = (cellptr)malloc(sizeof(cell));
+      tmp = mm_alloc<cell>(sizeof(cell));
     }
   Type(tmp) = CELL;
   Proc(tmp) = p;
@@ -498,19 +498,19 @@ typedef struct {
   vector acc0;			/* computed acceleration at pos0    */
 } hgstruct, *hgsptr;
 
-hgstruct gravsub(nodeptr p, hgstruct hg);
-hgstruct walksub(nodeptr p, real dsq, real tolsq, hgstruct hg, int level);
-bool subdivp(nodeptr p, real dsq, real tolsq, hgstruct hg);
+hgstruct gravsub(mm_ptr<node> p, hgstruct hg);
+hgstruct walksub(mm_ptr<node> p, real dsq, real tolsq, hgstruct hg, int level);
+bool subdivp(mm_ptr<node> p, real dsq, real tolsq, hgstruct hg);
 double sqrt(double arg);
-void grav(real rsize, nodeptr rt, mm_ptr<body> q, int nstep, real dthf);
+void grav(real rsize, mm_ptr<node> rt, mm_ptr<body> q, int nstep, real dthf);
 void vp(mm_ptr<body> q, int nstep);
-void hackgrav(mm_ptr<body> p, real rsize, nodeptr rt);
+void hackgrav(mm_ptr<body> p, real rsize, mm_ptr<node> rt);
 
 void computegrav(mm_ptr<tree> t, int nstep)
 {  register int i;
    real rsize;
    real dthf;
-   nodeptr root;
+   mm_ptr<node> root = NULL;
    mm_ptr<body> blist = NULL;
 
    /* loop over particles   */
@@ -526,7 +526,7 @@ void computegrav(mm_ptr<tree> t, int nstep)
 }
 
 
-void grav(real rsize, nodeptr rt, mm_ptr<body> bodies, int nstep, real dthf)
+void grav(real rsize, mm_ptr<node> rt, mm_ptr<body> bodies, int nstep, real dthf)
 {
   register mm_ptr<body> p = NULL, q = NULL;
   int i=0;
@@ -639,7 +639,7 @@ void vp(mm_ptr<body> q, int nstep)
   
 /*
  */
-void gravstep(real rsize, nodeptr rt, mm_ptr<body> p, int nstep, real dthf)
+void gravstep(real rsize, mm_ptr<node> rt, mm_ptr<body> p, int nstep, real dthf)
 {
 
   hackgrav(p, rsize, rt);			/*   compute new acc for p  */
@@ -650,7 +650,7 @@ void gravstep(real rsize, nodeptr rt, mm_ptr<body> p, int nstep, real dthf)
  */
 
 
-void hackgrav(mm_ptr<body> p, real rsize, nodeptr rt)
+void hackgrav(mm_ptr<body> p, real rsize, mm_ptr<node> rt)
 {
   hgstruct hg;
   real szsq;
@@ -672,7 +672,7 @@ void hackgrav(mm_ptr<body> p, real rsize, nodeptr rt)
  * GRAVSUB: compute a single body-body or body-cell interaction.
  */
 
-hgstruct gravsub(nodeptr p, hgstruct hg)
+hgstruct gravsub(mm_ptr<node> p, hgstruct hg)
 {
   real drabs, phii, mor3;
   vector ai, quaddr;
@@ -729,14 +729,14 @@ hgstruct gravsub(nodeptr p, hgstruct hg)
  * dsq: size of cell squared 
  */
 
- bool subdivp(nodeptr p, real dsq, real tolsq, hgstruct hg)
+ bool subdivp(mm_ptr<node> p, real dsq, real tolsq, hgstruct hg)
 {
-  register nodeptr local_p;
+  register mm_ptr<node> local_p = NULL;
   vector dr;
   vector pos;
   real drsq;
 
-  local_p = (nodeptr)p;
+  local_p = (mm_ptr<node>)p;
   if (Type(local_p) == BODY) /*<-- 27% load penalty */                  /* at tip of tree? */
     return (FALSE);                           /*   then cant subdivide */
 
@@ -757,41 +757,41 @@ double ceil();
 
 bodyptr body_alloc(int p, real p0, real p1, real p2, real v0, real v1, real v2, real a0, real a1, real a2, real mass, bodyptr ob);
 mm_ptr<body> ubody_alloc(int p);
-cellptr cell_alloc(int p);
+mm_ptr<cell> cell_alloc(int p);
 
 typedef struct {
-  nodeptr tp;
+  mm_ptr<node> tp;
   int num;
 } dtstruct;
 
 typedef struct {
-  nodeptr tp;
+  mm_ptr<node> tp;
   int num;
   int proc;
 } dt1struct;
 
 
-nodeptr loadtree(mm_ptr<body> p, icstruct xpic, nodeptr t, int l, mm_ptr<tree> tr);
+mm_ptr<node> loadtree(mm_ptr<body> p, icstruct xpic, mm_ptr<node> t, int l, mm_ptr<tree> tr);
 void expandbox(mm_ptr<body> p, mm_ptr<tree> t, int nsteps, int proc);
 icstruct intcoord1(double rp0, double rp1, double rp2,  mm_ptr<tree> t);
 icstruct intcoord(mm_ptr<body> p,  mm_ptr<tree> t);
 int ic_test(mm_ptr<body> p, mm_ptr<tree> t);
-int subindex(bodyptr p, mm_ptr<tree> t, int l);
-real hackcofm(nodeptr q);
+int subindex(mm_ptr<body> p, mm_ptr<tree> t, int l);
+real hackcofm(mm_ptr<node> q);
 
 
-int dis2_number(nodeptr n, int prev_bodies, int tnperproc);
-void dis_number (nodeptr n);
+int dis2_number(mm_ptr<node> n, int prev_bodies, int tnperproc);
+void dis_number (mm_ptr<node> n);
 
 /*
  *  MAKETREE: initialize tree structure for hack force calculation.
  */
 
-nodeptr maketree(mm_ptr<body> btab, int nb, mm_ptr<tree> t, int nsteps, int proc)
+mm_ptr<node> maketree(mm_ptr<body> btab, int nb, mm_ptr<tree> t, int nsteps, int proc)
 {  
   register mm_ptr<body> q = NULL;
   int tmp;
-  nodeptr node1;
+  mm_ptr<node> node1 = NULL;
   icstruct xqic;
   int holder;
 
@@ -839,7 +839,7 @@ void expandbox(mm_ptr<body> p, mm_ptr<tree> t, int nsteps, int proc)
     icstruct ic;
     int k;
     vector rmid;
-    cellptr  newt;
+    mm_ptr<cell>  newt = NULL;
     tree tmp;
     real rsize;
     int inbox;
@@ -884,7 +884,7 @@ void expandbox(mm_ptr<body> p, mm_ptr<tree> t, int nsteps, int proc)
 	   assert(ic.inb, 1);	                /* xmid                     */
 	   k = old_subindex(ic, IMAX >> 1);        /*     find old tree index  */
 	   Subp(newt)[k] = Root(t);            /*     graft old on new     */
-	   Root(t) = (nodeptr) newt;           /*     plant new tree       */
+	   Root(t) = (mm_ptr<node>) newt;           /*     plant new tree       */
 	   inbox = ic_test(p, t);
       } /* if Root... */
     } /* while !inbox */
@@ -898,15 +898,15 @@ void expandbox(mm_ptr<body> p, mm_ptr<tree> t, int nsteps, int proc)
  * l - current level in tree 
  */
 
-nodeptr loadtree(mm_ptr<body> p, icstruct xpic, nodeptr t, int l, mm_ptr<tree> tr)
+mm_ptr<node> loadtree(mm_ptr<body> p, icstruct xpic, mm_ptr<node> t, int l, mm_ptr<tree> tr)
 {
   int si;
-  cellptr c;
-  nodeptr rt;
+  mm_ptr<cell> c = NULL;
+  mm_ptr<node> rt = NULL;
 
   if (t == NULL)
      {
-      return ((nodeptr) _getptr_mm<body>(p));
+      return (mm_ptr<node>) p;
      }
   else {
     assert(l != 0, 2);				/*   dont run out of bits   */
@@ -917,16 +917,16 @@ nodeptr loadtree(mm_ptr<body> p, icstruct xpic, nodeptr t, int l, mm_ptr<tree> t
       /*chatting("Collision\n");*/
       /*printtree(t); printtree(p);*/
       i = PID(t);
-      c = (cellptr) cell_alloc(i);
-      si = subindex((bodyptr) t, tr, l); 
-     
-      Subp(c)[si] = (nodeptr) t;        	/*     put body in cell     */
-      t = (nodeptr) c;	        	/*     link cell in tree    */
+      c = (mm_ptr<cell>) cell_alloc(i);
+      si = subindex((mm_ptr<body>) t, tr, l);
+ 
+      Subp(c)[si] = (mm_ptr<node>) t;        	/*     put body in cell     */
+      t = (mm_ptr<node>) c;	        	/*     link cell in tree    */
     }
 
     si = old_subindex(xpic, l);     /* move down one level      */
-    rt = Subp((cellptr) t)[si];
-    Subp((cellptr) t)[si] = loadtree(p, xpic, rt, l >> 1, tr);
+    rt = Subp((mm_ptr<cell>) t)[si];
+    Subp((mm_ptr<cell>) t)[si] = loadtree(p, xpic, rt, l >> 1, tr);
   }
   return (t);
 }
@@ -1082,7 +1082,7 @@ int ic_test(mm_ptr<body> p, mm_ptr<tree> t)
  * SUBINDEX: determine which subcell to select.  Rolled intcoord & subindex together.
  */
 
-int subindex(bodyptr p, mm_ptr<tree> t , int l)
+int subindex(mm_ptr<body> p, mm_ptr<tree> t , int l)
 {
     register int i, k;
     register real rsize;
@@ -1135,10 +1135,10 @@ int old_subindex(icstruct ic, int l)
  * HACKCOFM: descend tree finding center-of-mass coordinates.
  */
 
-real hackcofm(nodeptr q)
+real hackcofm(mm_ptr<node> q)
 {
     register int i;
-    register nodeptr r;
+    register mm_ptr<node> r = NULL;
     vector tmpv;
     vector tmp_pos;
     register real mq, mr;
@@ -1148,7 +1148,7 @@ real hackcofm(nodeptr q)
       mq = 0.0;
       CLRV(tmp_pos);				/*   and c. of m.           */
       for (i=0; i < NSUB; i++) {
-	     r = Subp((cellptr) q)[i];
+	     r = Subp((mm_ptr<cell>) q)[i];
 	     if (r != NULL) {
 	       mr = hackcofm(r);
 	       mq = mr + mq;
@@ -1180,54 +1180,54 @@ real hackcofm(nodeptr q)
 
 /* preorder traversal of the tree pointed to by n. */
 
-void printtree(nodeptr n)
+void printtree(mm_ptr<node> n)
 { ptree(n, 0);
 }
 
-void ptree(nodeptr n, int level)
-{ 
-  nodeptr r;
-  
-  
+void ptree(mm_ptr<node> n, int level)
+{
+  mm_ptr<node> r = NULL;
+
+
   if (n != NULL) {
     if (Type(n) == BODY) {
-      chatting("%2d BODY@%x %f, %f, %f\n", level, n, Pos(n)[0], Pos(n)[1], Pos(n)[2]);
+      chatting("%2d BODY@%x %f, %f, %f\n", level, _getptr_mm<node>(n), Pos(n)[0], Pos(n)[1], Pos(n)[2]);
     }
     else /* CELL */ {
       int i;
 
-      chatting("%2d CELL@%x %f, %f, %f\n", level, n,Pos(n)[0], Pos(n)[1], Pos(n)[2]);
+      chatting("%2d CELL@%x %f, %f, %f\n", level, _getptr_mm<node>(n), Pos(n)[0], Pos(n)[1], Pos(n)[2]);
       for (i = 0; i < NSUB; i++) {
-	r = Subp((cellptr) n)[i];
+	r = Subp((mm_ptr<cell>) n)[i];
 	ptree(r, level+1);
       }
     }
   }
-  else 
+  else
     printf("%2d NULL TREE\n", level);
 }
 
-      
+
 
 typedef struct {
   int bits;
   int split;
-  cellptr new; 
-  nodeptr non_local[NSUB];
+  mm_ptr<cell> new;
+  mm_ptr<node> non_local[NSUB];
 } dt3_struct;
 
 
-void dis_number (nodeptr n)
+void dis_number (mm_ptr<node> n)
 {
   int tnperproc = (int) ceil ( (double) nbody/NumNodes);
 
   dis2_number(n, -1, tnperproc);
 }
 
-int dis2_number(nodeptr n, int prev_bodies, int tnperproc)
+int dis2_number(mm_ptr<node> n, int prev_bodies, int tnperproc)
 {
 
-  if (n == NULL) 
+  if (n == NULL)
     return prev_bodies;
 
   else if (Type(n) == BODY) {
@@ -1237,11 +1237,11 @@ int dis2_number(nodeptr n, int prev_bodies, int tnperproc)
 
   else { /* cell */
     register int i;
-    register nodeptr r;
+    register mm_ptr<node> r = NULL;
 
     /*NOTEST();*/
     for (i=0; i < NSUB; i++) {
-      r = Subp((cellptr) n)[i];
+      r = Subp((mm_ptr<cell>) n)[i];
       prev_bodies = dis2_number(r, prev_bodies, tnperproc);
     }
 
