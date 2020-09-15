@@ -2,6 +2,7 @@
 
 #### Benchmarks that are under rewriting
 - bh
+- em3d
 - health
 
 #### Benchmarks that have been rewritten
