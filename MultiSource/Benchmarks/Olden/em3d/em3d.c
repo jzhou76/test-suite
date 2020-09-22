@@ -2,11 +2,10 @@
 
 #include "em3d.h"
 int nonlocals=0;
-void compute_nodes(nodelist)
-register node_t *nodelist;
+void compute_nodes(register node_ptr nodelist)
 {
   register int i;
-  register node_t *localnode;
+  register node_ptr localnode = NULL;
   
   for (; nodelist; ) {
     register double cur_value;

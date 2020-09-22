@@ -7,9 +7,9 @@ extern int NumNodes;
 
 int DebugFlag;
 
-void print_graph(graph_t *graph, int id) 
+void print_graph(graph_ptr graph, int id) 
 {
-  node_t *cur_node;
+  node_ptr cur_node = NULL;
   cur_node=graph->e_nodes[id];
 
   for(; cur_node; cur_node=cur_node->next)
@@ -30,13 +30,13 @@ extern int nonlocals;
 int main(int argc, char *argv[])
 {
   int i;
-  graph_t *graph;
+  graph_ptr graph = NULL;
 
   dealwithargs(argc,argv);
 
   chatting("Hello world--Doing em3d with args %d %d %d %d\n",
            n_nodes,d_nodes,local_p,NumNodes);
-  graph=initialize_graph();
+  graph = initialize_graph();
   if (DebugFlag) 
     for(i=0; i<NumNodes;i++)
       print_graph(graph,i);

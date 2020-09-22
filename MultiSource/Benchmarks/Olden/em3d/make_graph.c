@@ -22,27 +22,28 @@ int n_nodes;
 int d_nodes;
 int local_p;
 
-node_t **make_table(int size, int procname) {
-  node_t **retval = (node_t **)malloc(size*sizeof(node_t *));
-  assert(retval);
+node_ptr_arr make_table(int size, int procname) {
+  node_ptr_arr retval =
+      mm_array_alloc<mm_ptr<node_t>>(size*sizeof(mm_ptr<node_t>));
+  assert(_getptr_mm_array<mm_ptr<node_t>>(retval));
   return retval;
 }
 
 /* We expect node_table to be a local table of e or h nodes */
-void fill_table(node_t **node_table, double *values, int size, int procname)
+void fill_table(node_ptr_arr node_table, double *values, int size, int procname)
 {
-  node_t *cur_node, *prev_node;
+  node_ptr cur_node = NULL, prev_node = NULL;
   int i;
-  
-  prev_node = (node_t *)malloc(sizeof(node_t));
+
+  prev_node = mm_alloc<node_t>(sizeof(node_t));
   node_table[0] = prev_node;
   *values = gen_uniform_double();
   prev_node->value = values++;
   prev_node->from_count = 0;
-  
+
   /* Now we fill the node_table with allocated nodes */
   for (i=1; i<size; i++) {
-    cur_node = (node_t *)malloc(sizeof(node_t));
+    cur_node = mm_alloc<node_t>(sizeof(node_t));
     *values = gen_uniform_double();
     cur_node->value = values++;
     cur_node->from_count = 0;
@@ -53,17 +54,17 @@ void fill_table(node_t **node_table, double *values, int size, int procname)
   cur_node->next = NULL;
 }
 
-void make_neighbors(node_t *nodelist, node_t **table[], int tablesz,
+void make_neighbors(node_ptr nodelist, node_ptr_arr *table, int tablesz,
 		    int degree, int percent_local, int id)
 {
-  node_t *cur_node;
+  node_ptr cur_node = NULL;
 
   for(cur_node = nodelist; cur_node; cur_node=cur_node->next) {
-    node_t *other_node;
+    node_ptr other_node = NULL;
     int j,k;
     int dest_proc;
 
-    cur_node->to_nodes = (node_t **)malloc(degree*(sizeof(node_t *)));
+    cur_node->to_nodes = mm_array_alloc<node_ptr>(degree * sizeof(node_ptr));
     if (!cur_node->to_nodes) {
       chatting("Uncaught malloc error\n");
       exit(0);
@@ -71,7 +72,7 @@ void make_neighbors(node_t *nodelist, node_t **table[], int tablesz,
 
     for (j=0; j<degree; j++) {
       do {
-        node_t **local_table;
+        node_ptr_arr local_table = NULL;
         int number = gen_number(tablesz);
 
         if (check_percent(percent_local)) {
@@ -115,35 +116,35 @@ void make_neighbors(node_t *nodelist, node_t **table[], int tablesz,
   }
 }
 
-void update_from_coeffs(node_t *nodelist) {
-  node_t *cur_node;
-  
-  /* Setup coefficient and from_nodes vectors for h nodes */  
+void update_from_coeffs(node_ptr nodelist) {
+  node_ptr cur_node = NULL;
+
+  /* Setup coefficient and from_nodes vectors for h nodes */
   for (cur_node = nodelist; cur_node; cur_node=cur_node->next) {
     int from_count = cur_node->from_count;
-    
+
     if (from_count < 1) {
       chatting("Help! no from count (from_count=%d) \n", from_count);
-      cur_node->from_values = (double **)malloc(20 * sizeof(double *));
-      cur_node->coeffs = (double *)malloc(20 * sizeof(double));
+      cur_node->from_values = mm_array_alloc<double *>(20 * sizeof(double *));
+      cur_node->coeffs = mm_array_alloc<double>(20 * sizeof(double));
       cur_node->from_length = 0;
     } else {
-      cur_node->from_values = (double **)malloc(from_count * sizeof(double *));
-      cur_node->coeffs = (double *)malloc(from_count * sizeof(double));
+      cur_node->from_values = mm_array_alloc<double *>(from_count * sizeof(double *));
+      cur_node->coeffs = mm_array_alloc<double>(from_count * sizeof(double));
       cur_node->from_length = 0;
     }
   }
 }
 
-void fill_from_fields(node_t *nodelist, int degree) {
-  node_t *cur_node;
+void fill_from_fields(node_ptr nodelist, int degree) {
+  node_ptr cur_node = NULL;
   for(cur_node = nodelist; cur_node; cur_node = cur_node->next) {
     int j;
 
     for (j=0; j<degree; j++) {
       int count,thecount;
-      node_t *other_node = cur_node->to_nodes[j]; /* <-- 6% load miss penalty */
-      double **otherlist;
+      node_ptr other_node = cur_node->to_nodes[j]; /* <-- 6% load miss penalty */
+      mm_array_ptr<double *> otherlist = NULL;
       double *value = cur_node->value;
 
       if (!other_node) chatting("Help!!\n");
@@ -156,7 +157,7 @@ void fill_from_fields(node_t *nodelist, int degree) {
         otherlist = other_node->from_values;
         /*chatting("No from list!! 0x%p\n",otherlist);*/
       }
-      
+
       otherlist[count] = value;                 /* <------ 42% store penalty */
 
       /* <----- 42+6.5% store penalty */
@@ -165,8 +166,8 @@ void fill_from_fields(node_t *nodelist, int degree) {
   }
 }
 
-void localize_local(node_t *nodelist) {
-  node_t *cur_node;
+void localize_local(node_ptr nodelist) {
+  node_ptr cur_node = NULL;
 
   for(cur_node = nodelist; cur_node; cur_node = cur_node->next) {
     cur_node->coeffs = cur_node->coeffs;
@@ -176,8 +177,8 @@ void localize_local(node_t *nodelist) {
 }
 
 
-void make_tables(table_t *table,int groupname) {
-  node_t **h_table,**e_table;
+void make_tables(table_ptr table,int groupname) {
+  node_ptr_arr h_table = NULL, e_table = NULL;
   double *h_values, *e_values;
   int procname = 0;
 
@@ -195,10 +196,10 @@ void make_tables(table_t *table,int groupname) {
   table->h_table[groupname] = h_table;
 }
 
-void make_all_neighbors(table_t *table,int groupname) {
-  node_t *first_node;
-  node_t **local_table;
-  node_t ***local_table_array;
+void make_all_neighbors(table_ptr table,int groupname) {
+  node_ptr first_node = NULL;
+  node_ptr_arr local_table = NULL;
+  node_ptr_arr *local_table_array = NULL;
 
   init_random(SEED2*groupname);
   /* We expect table to be remote */
@@ -217,10 +218,10 @@ void make_all_neighbors(table_t *table,int groupname) {
 		 d_nodes,local_p,groupname);
 }
 
-void update_all_from_coeffs(table_t *table, int groupname)    
+void update_all_from_coeffs(table_ptr table, int groupname)
 {
-  node_t **local_table;
-  node_t *first_node;
+  node_ptr_arr local_table = NULL;
+  node_ptr first_node = NULL;
 
   /* Done by do_all, table not local */
   local_table = table->h_table[groupname];
@@ -233,10 +234,10 @@ void update_all_from_coeffs(table_t *table, int groupname)
   update_from_coeffs(first_node);
 }
 
-void fill_all_from_fields(table_t *table, int groupname)
+void fill_all_from_fields(table_ptr table, int groupname)
 {
-  node_t **local_table;
-  node_t *first_node;
+  node_ptr_arr local_table = NULL;
+  node_ptr first_node = NULL;
 
   init_random(SEED3*groupname);
   local_table = table->h_table[groupname];
@@ -248,10 +249,10 @@ void fill_all_from_fields(table_t *table, int groupname)
   fill_from_fields(first_node,d_nodes);
 }
 
-void localize(table_t *table, int groupname)
+void localize(table_ptr table, int groupname)
 {
-  node_t **local_table;
-  node_t *first_node;
+  node_ptr_arr local_table = NULL;
+  node_ptr first_node = NULL;
 
   local_table = table->h_table[groupname];
   first_node = local_table[0];
@@ -261,14 +262,14 @@ void localize(table_t *table, int groupname)
   first_node = local_table[0];
   localize_local(first_node);
 }
-  
-void clear_nummiss(table_t *table, int groupname)
+
+void clear_nummiss(table_ptr table, int groupname)
 {
   NumMisses = 0;
 }
 
-void do_all(table_t *table, int groupname, int nproc,
-	    void func(table_t *, int),int groupsize) {
+void do_all(table_ptr table, int groupname, int nproc,
+	    void func(table_ptr, int),int groupsize) {
   /*chatting("do all group %d with %d\n",groupname,nproc);*/
   if (nproc > 1) {
     do_all(table,groupname+nproc/2,nproc/2,func,groupsize);
@@ -278,14 +279,14 @@ void do_all(table_t *table, int groupname, int nproc,
   }
 }
 
-graph_t *initialize_graph() {
-  table_t *table;
-  graph_t *retval;
+graph_ptr initialize_graph() {
+  table_ptr table = NULL;
+  graph_ptr retval = NULL;
   int i,j,blocksize;
   int groupsize;
 
-  table = (table_t *)malloc(sizeof(table_t));
-  retval = (graph_t *)malloc(sizeof(graph_t));
+  table = mm_alloc<table_t>(sizeof(table_t));
+  retval = mm_alloc<graph_t>(sizeof(graph_t));
 
   groupsize = PROCS/NumNodes;
 
@@ -313,23 +314,23 @@ graph_t *initialize_graph() {
 
   chatting("cleanup for return now\n");
   for (i=0; i<NumNodes; i++) {
-    node_t **local_table = table->e_table[i*blocksize];
-    node_t *local_node_r = local_table[0];
+    node_ptr_arr local_table = table->e_table[i*blocksize];
+    node_ptr local_node_r = local_table[0];
 
     retval->e_nodes[i] = local_node_r;
-      
+
     local_table = table->h_table[i*blocksize];
     local_node_r = local_table[0];
     retval->h_nodes[i] = local_node_r;
     for (j = 1; j < blocksize; j++) {
-      node_t *local_node_l;
+      node_ptr local_node_l = NULL;
 
       local_table = table->e_table[i*blocksize+j-1];
       local_node_l = local_table[(n_nodes/PROCS)-1];
       local_table = table->e_table[i*blocksize+j];
       local_node_r = local_table[0];
       local_node_l->next = local_node_r;
-      
+
       local_table = table->h_table[i*blocksize+j-1];
       local_node_l = local_table[(n_nodes/PROCS)-1];
       local_table = table->h_table[i*blocksize+j];
@@ -337,7 +338,7 @@ graph_t *initialize_graph() {
       local_node_l->next = local_node_r;
     }
   }
-  
+
   chatting("Clearing NumMisses\n");
   do_all(table,0,PROCS,clear_nummiss,groupsize);
   chatting("Returning\n");

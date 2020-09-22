@@ -18,6 +18,8 @@ long lrand48(void);
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "safe_mm_checked.h"
+
 #define chatting printf
 
 extern char * min_ptr;
@@ -30,28 +32,36 @@ extern int local_p; /* percentage of local edges */
 
 #define assert(a) if (!a) {printf("Assertion failure\n"); exit(-1);}
 
+/* mmsafe pointer related typedef */
+typedef mm_ptr<struct node_t> node_ptr;
+typedef mm_ptr<struct graph_t> graph_ptr;
+typedef mm_array_ptr<mm_ptr<struct node_t>> node_ptr_arr;
+typedef mm_ptr<struct table_t> table_ptr;
+
 typedef struct node_t {
   double *value;
-  struct node_t *next;
-  struct node_t **to_nodes; /* array of nodes pointed to */
-  double **from_values; /* array of ptrs to vals where data comes from */
-  double *coeffs; /* array of coeffs on edges */
+  mm_ptr<struct node_t> next;
+  node_ptr_arr to_nodes; /* array of nodes pointed to */
+  /* double **from_values; /1* array of ptrs to vals where data comes from *1/ */
+  mm_array_ptr<double *> from_values;
+  /* double *coeffs; /1* array of coeffs on edges *1/ */
+  mm_array_ptr<double> coeffs;
   int from_count;
   int from_length;
 } node_t;
 
 typedef struct graph_t {
-  node_t *e_nodes[PROCS];
-  node_t *h_nodes[PROCS];
+  node_ptr e_nodes[PROCS];
+  node_ptr h_nodes[PROCS];
 } graph_t;
 
 typedef struct table_t {
-  node_t **e_table[PROCS];
-  node_t **h_table[PROCS];
+  node_ptr_arr e_table[PROCS];
+  node_ptr_arr h_table[PROCS];
 } table_t;
 
 /* Perform 1 step for a nodelist */
-void compute_nodes(node_t *nodelist);
+void compute_nodes(mm_ptr<node_t> nodelist);
 double gen_uniform_double(void);
 
 #endif
