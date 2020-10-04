@@ -39,11 +39,11 @@ typedef mm_array_ptr<mm_ptr<struct node_t>> node_ptr_arr;
 typedef mm_ptr<struct table_t> table_ptr;
 
 typedef struct node_t {
-  double *value;
+  mm_array_ptr<double> value;
   mm_ptr<struct node_t> next;
   node_ptr_arr to_nodes; /* array of nodes pointed to */
   /* double **from_values; /1* array of ptrs to vals where data comes from *1/ */
-  mm_array_ptr<double *> from_values;
+  mm_array_ptr<mm_array_ptr<double>> from_values;
   /* double *coeffs; /1* array of coeffs on edges *1/ */
   mm_array_ptr<double> coeffs;
   int from_count;

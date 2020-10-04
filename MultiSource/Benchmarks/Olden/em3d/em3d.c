@@ -10,7 +10,7 @@ void compute_nodes(register node_ptr nodelist)
   for (; nodelist; ) {
     register double cur_value;
     register int from_count ;
-    register double *other_value;
+    register mm_array_ptr<double> other_value = NULL;
     register double coeff;
     register double value;
     /*register double *coeffs;*/

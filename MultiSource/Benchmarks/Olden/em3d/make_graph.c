@@ -30,7 +30,8 @@ node_ptr_arr make_table(int size, int procname) {
 }
 
 /* We expect node_table to be a local table of e or h nodes */
-void fill_table(node_ptr_arr node_table, double *values, int size, int procname)
+void fill_table(node_ptr_arr node_table, mm_array_ptr<double > values,
+                int size, int procname)
 {
   node_ptr cur_node = NULL, prev_node = NULL;
   int i;
@@ -125,11 +126,13 @@ void update_from_coeffs(node_ptr nodelist) {
 
     if (from_count < 1) {
       chatting("Help! no from count (from_count=%d) \n", from_count);
-      cur_node->from_values = mm_array_alloc<double *>(20 * sizeof(double *));
+      cur_node->from_values =
+          mm_array_alloc<mm_array_ptr<double>>(20 * sizeof(mm_array_ptr<double>));
       cur_node->coeffs = mm_array_alloc<double>(20 * sizeof(double));
       cur_node->from_length = 0;
     } else {
-      cur_node->from_values = mm_array_alloc<double *>(from_count * sizeof(double *));
+      cur_node->from_values =
+          mm_array_alloc<mm_array_ptr<double>>(from_count * sizeof(mm_array_ptr<double>));
       cur_node->coeffs = mm_array_alloc<double>(from_count * sizeof(double));
       cur_node->from_length = 0;
     }
@@ -144,8 +147,8 @@ void fill_from_fields(node_ptr nodelist, int degree) {
     for (j=0; j<degree; j++) {
       int count,thecount;
       node_ptr other_node = cur_node->to_nodes[j]; /* <-- 6% load miss penalty */
-      mm_array_ptr<double *> otherlist = NULL;
-      double *value = cur_node->value;
+      mm_array_ptr<mm_array_ptr<double>> otherlist = NULL;
+      mm_array_ptr<double> value = cur_node->value;
 
       if (!other_node) chatting("Help!!\n");
       count=(other_node->from_length)++;  /* <----- 30% load miss penalty */
@@ -179,14 +182,14 @@ void localize_local(node_ptr nodelist) {
 
 void make_tables(table_ptr table,int groupname) {
   node_ptr_arr h_table = NULL, e_table = NULL;
-  double *h_values, *e_values;
+  mm_array_ptr<double> h_values = NULL, e_values = NULL;
   int procname = 0;
 
   init_random(SEED1*groupname);
-  h_values = (double *)malloc(n_nodes/PROCS*sizeof(double));
+  h_values = mm_array_alloc<double>(n_nodes/PROCS*sizeof(double));
   h_table = make_table(n_nodes/PROCS,procname);
   fill_table(h_table,h_values,n_nodes/PROCS,procname);
-  e_values = (double *)malloc(n_nodes/PROCS*sizeof(double));
+  e_values = mm_array_alloc<double>(n_nodes/PROCS*sizeof(double));
   e_table = make_table(n_nodes/PROCS,procname);
   fill_table(e_table,e_values,n_nodes/PROCS,procname);
 
