@@ -8,3 +8,5 @@
 
 # vim temporary files
 *.swp
+
+cscope.out
