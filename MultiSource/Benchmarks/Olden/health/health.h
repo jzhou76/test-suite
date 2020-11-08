@@ -40,9 +40,9 @@ struct Patient {
 };
 
 struct List {
-  struct List            *forward;
+  mm_ptr<struct List>    forward;
   mm_ptr<struct Patient> patient;
-  struct List            *back;
+  mm_ptr<struct List>    back;
 };
 
 struct Hosp {
@@ -83,19 +83,24 @@ struct Village {
 #endif
 };
 
+typedef mm_ptr<struct List> mm_ptr_List;
+typedef mm_ptr<struct Village> mm_ptr_Village;
+typedef mm_ptr<struct Patient> mm_ptr_Patient;
+typedef mm_ptr<struct Hosp> mm_ptr_Hosp;
+
 mm_ptr<struct Village>
 alloc_tree(int level, int label, mm_ptr<struct Village> back);
 void dealwithargs(int argc, char *argv[]);
 float my_rand(long long idum);
 mm_ptr<struct Patient> generate_patient(mm_ptr<struct Village> village);
-void put_in_hosp(struct Hosp *hosp, mm_ptr<struct Patient> patient);
-void addList(struct List *list, mm_ptr<struct Patient> patient);
-void removeList(struct List *list, mm_ptr<struct Patient> patient);
-struct List *sim(mm_ptr<struct Village> village);
-void check_patients_inside(mm_ptr<struct Village> village, struct List *list);
-struct List *check_patients_assess(mm_ptr<struct Village> village,
-                                   struct List *list);
-void check_patients_waiting(mm_ptr<struct Village> village, struct List *list);
+void put_in_hosp(mm_ptr_Hosp hosp, mm_ptr<struct Patient> patient);
+void addList(mm_ptr_List list, mm_ptr<struct Patient> patient);
+void removeList(mm_ptr_List list, mm_ptr<struct Patient> patient);
+mm_ptr_List sim(mm_ptr<struct Village> village);
+void check_patients_inside(mm_ptr<struct Village> village, mm_ptr_List list);
+mm_ptr_List check_patients_assess(mm_ptr<struct Village> village,
+                                  mm_ptr_List list);
+void check_patients_waiting(mm_ptr<struct Village> village, mm_ptr_List list);
 float get_num_people(mm_ptr<struct Village> village);
 float get_total_time(mm_ptr<struct Village> village);
 float get_total_hosps(mm_ptr<struct Village> village);
