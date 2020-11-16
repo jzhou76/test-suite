@@ -1,0 +1,33 @@
+nbody = 500000, numnodes = 30
+bodies created 
+Bodies per 0 = 15583
+Bodies per 1 = 15497
+Bodies per 2 = 15765
+Bodies per 3 = 15819
+Bodies per 4 = 15566
+Bodies per 5 = 15552
+Bodies per 6 = 15646
+Bodies per 7 = 15618
+Bodies per 8 = 15562
+Bodies per 9 = 15603
+Bodies per 10 = 15632
+Bodies per 11 = 15566
+Bodies per 12 = 15679
+Bodies per 13 = 15568
+Bodies per 14 = 15847
+Bodies per 15 = 15743
+Bodies per 16 = 15590
+Bodies per 17 = 15563
+Bodies per 18 = 15798
+Bodies per 19 = 15701
+Bodies per 20 = 15576
+Bodies per 21 = 15494
+Bodies per 22 = 15585
+Bodies per 23 = 15480
+Bodies per 24 = 15693
+Bodies per 25 = 15779
+Bodies per 26 = 15503
+Bodies per 27 = 15576
+Bodies per 28 = 15698
+Bodies per 29 = 15446
+exit 0
