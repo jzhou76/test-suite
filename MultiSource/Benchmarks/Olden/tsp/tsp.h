@@ -5,6 +5,8 @@
 extern int NumNodes, NDim;
 #endif
 
+#include "safe_mm_checked.h"
+
 extern int flag;
 
 int atoi(const char *);
@@ -16,14 +18,16 @@ int dealwithargs(int argc, char *argv[]);
 typedef struct tree {
   int sz;
   double x,y;
-  struct tree *left, *right;
+  mm_ptr<struct tree> left, right;
 #ifdef TORONTO
-  struct tree *next, *prev;
+  mm_ptr<struct tree> next, prev;
 #else
-  struct tree *next {95}, *prev {95};
+  mm_ptr<struct tree> next {95}, prev {95};
 #endif
 
-} *Tree;
+};
+
+typedef mm_ptr<struct tree> Tree;
 
 #ifdef ORDER
 

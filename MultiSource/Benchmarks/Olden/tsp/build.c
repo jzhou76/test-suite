@@ -76,14 +76,14 @@ static double uniform(double min, double max) {
 Tree build_tree(int n,int dir,int lo,int num_proc,double min_x,
                 double max_x,double min_y,double max_y) {
   double med;
-  Tree t;
+  Tree t = NULL;
 #ifdef FUTURES
   future_cell_int fc;
 #endif
 
   if (n==0) return NULL;
 
-  t = (Tree) ALLOC(lo,sizeof(*t));
+  t = mm_alloc<struct tree>(sizeof(struct tree));
 
   if (dir) {
     dir = !dir;
