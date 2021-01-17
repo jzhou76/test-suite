@@ -29,7 +29,7 @@ typedef struct {
 
 int main (int argc, char *argv[])
 {
-    tree_t	*root;
+    mm_ptr<tree_t> root = NULL;
     int level,result;
 
 #ifdef FUTURES
@@ -97,7 +97,7 @@ int main (int argc, char *argv[])
 
 /* TreeAdd:
  */
-int TreeAdd (tree_t *t)
+int TreeAdd (mm_ptr<tree_t> t)
 {
   if (t == NULL)  {
     return 0;
@@ -106,7 +106,7 @@ int TreeAdd (tree_t *t)
 #ifdef FUTURES    
     future_cell_int leftval;
     int rightval;
-    tree_t *tleft, *tright;
+    mm_ptr<tree_t> tleft = NULL, tright = NULL;
     int value;
 
     tleft = t->left;
@@ -124,7 +124,7 @@ int TreeAdd (tree_t *t)
 #else
     int leftval;
     int rightval;
-    tree_t *tleft, *tright;
+    mm_ptr<tree_t> tleft = NULL, tright = NULL;
     int value;
 
     tleft = t->left;            /* <---- 57% load penalty */
