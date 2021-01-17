@@ -60,7 +60,7 @@ static ChildType reflect(Direction d, ChildType ct)
 
 int CountTree(QuadTree tree) 
 {
-  QuadTree nw,ne,sw,se;
+  QuadTree nw = NULL, ne = NULL, sw = NULL,se = NULL;
 
   nw = tree->nw; ne = tree->ne; sw = tree->sw; se = tree->se;
   if (nw==NULL && ne==NULL && sw==NULL && se==NULL)
@@ -93,7 +93,7 @@ static QuadTree child(QuadTree tree, ChildType ct)
 
 static QuadTree gtequal_adj_neighbor(QuadTree tree, Direction d)
 {
-  QuadTree q,parent;
+  QuadTree q = NULL, parent = NULL;
   ChildType ct;
   
   parent=tree->parent;
@@ -124,11 +124,11 @@ static int sum_adjacent(QuadTree p, ChildType q1, ChildType q2, int size)
 int perimeter(QuadTree tree, int size)
 {
   int retval = 0;
-  QuadTree neighbor;
+  QuadTree neighbor = NULL;
 
   if (tree->color==grey) 
     {
-      QuadTree child;
+      QuadTree child = NULL;
 #ifdef FUTURES
       future_cell_int fc_sw,fc_se,fc_ne;
 #endif
@@ -187,7 +187,7 @@ extern int dealwithargs(int argc, char * argv[]);
 
 int main(int argc, char *argv[])
 {
-  QuadTree tree;
+  QuadTree tree = NULL;
   int count;
   int level;
 

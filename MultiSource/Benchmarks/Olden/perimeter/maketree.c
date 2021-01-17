@@ -32,12 +32,12 @@ QuadTree MakeTree(int size, int center_x, int center_y, int lo_proc,
 		  int hi_proc, QuadTree parent, ChildType ct, int level) 
 {
   int intersect=0;
-  QuadTree retval;
+  QuadTree retval = NULL;
 
 #ifdef FUTURES
   retval = (QuadTree) ALLOC(lo_proc,sizeof(*retval));
 #else
-  retval = (QuadTree) malloc(sizeof(*retval));
+  retval = (QuadTree) mm_alloc<quad_struct>(sizeof(quad_struct));
 #endif
   retval->parent = parent;
   retval->childtype = ct;

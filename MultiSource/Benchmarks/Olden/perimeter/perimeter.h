@@ -4,7 +4,6 @@ extern int NumNodes;
 #define chatting      printf
 #endif
 
-#define NULL 0
 
 #ifndef TORONTO
 #include <cm/cmmd.h>
@@ -13,6 +12,8 @@ extern int NumNodes;
 #endif
 #include "mem-ref.h"
 #endif
+
+#include "safe_mm_checked.h"
 
 typedef enum {black, white, grey} Color;
 typedef enum {northwest, northeast, southwest, southeast} ChildType;
@@ -30,15 +31,16 @@ typedef struct quad_struct {
   struct quad_struct *se {50};
   struct quad_struct *parent {50};
 #else
-  struct quad_struct *nw;
-  struct quad_struct *ne;
-  struct quad_struct *sw;
-  struct quad_struct *se;
-  struct quad_struct *parent;
+  mm_ptr<struct quad_struct> nw;
+  mm_ptr<struct quad_struct> ne;
+  mm_ptr<struct quad_struct> sw;
+  mm_ptr<struct quad_struct> se;
+  mm_ptr<struct quad_struct> parent;
 #endif
 
-} quad_struct, *QuadTree;
+} quad_struct;
 
+typedef mm_ptr<quad_struct> QuadTree;
 
 QuadTree MakeTree(int size, int center_x, int center_y, int lo_proc,
                   int hi_proc, QuadTree parent, ChildType ct, int level);
