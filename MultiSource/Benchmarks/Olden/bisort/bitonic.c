@@ -202,11 +202,8 @@ int spr_val,dir;
 
 int
 /*******************/
-Bisort(root,spr_val,dir)
+Bisort(mm_ptr<HANDLE> root, int spr_val, int dir)
 /*******************/
-mm_ptr<HANDLE> root;
-int spr_val,dir;
-
 { mm_ptr<HANDLE> l = NULL;
   mm_ptr<HANDLE> r = NULL;
   int val;
