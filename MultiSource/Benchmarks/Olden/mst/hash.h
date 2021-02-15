@@ -2,6 +2,8 @@
 
 #include "stdio.h"
 
+#include "safe_mm_checked.h"
+
 typedef struct hash_entry {
   unsigned int key;
   void *entry;
