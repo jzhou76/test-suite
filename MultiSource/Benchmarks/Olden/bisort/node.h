@@ -17,7 +17,7 @@ typedef struct future_cell_int{
   mm_ptr<HANDLE> value;
 } future_cell_int;
 
-extern void *malloc(unsigned);
+/* extern void *malloc(unsigned); */
 
 #if 0
 #define NIL ((HANDLE *) 0)
