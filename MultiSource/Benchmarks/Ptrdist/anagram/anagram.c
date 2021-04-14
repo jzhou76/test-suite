@@ -137,6 +137,8 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "safe_mm_checked.h"
+
 /* Before compiling, make sure Quad and MASK_BITS are set properly.  For best
  * results, make Quad the largest integer size supported on your machine.
  * So if your machine has long longs, make Quad an unsigned long long.
@@ -201,11 +203,11 @@ typedef unsigned long Quad;             /* for building our bit mask */
 /* A Word remembers the information about a candidate word. */
 typedef struct {
     Quad aqMask[MAX_QUADS];  /* the word's mask */
-    char * pchWord;                 /* the word itself */
+    mm_array_ptr<char> pchWord;                 /* the word itself */
     unsigned cchLength;                 /* letters in the word */
 } Word;
-typedef Word * PWord;
-typedef Word * * PPWord;
+typedef mm_ptr<Word> PWord;
+typedef PWord *PPWord;
 
 PWord apwCand[MAXCAND];    /* candidates we've found so far */
 unsigned cpwCand;                       /* how many of them? */
@@ -240,7 +242,8 @@ int cchMinLength = 3;
 unsigned auGlobalFrequency[ALPHABET];
 char achByFrequency[ALPHABET];          /* for sorting */
 
-char * pchDictionary;               /* the dictionary is read here */
+/* char * pchDictionary;               /1* the dictionary is read here *1/ */
+mm_array_ptr<char> pchDictionary;               /* the dictionary is read here */
 
 #define Zero(t) memset(t, 0, sizeof(t)) /* quickly zero out an integer array */
 
@@ -264,8 +267,8 @@ void Fatal(char *pchMsg, unsigned u) {
 
 void ReadDict(char *pchFile) {
     FILE *fp;
-    char * pch;
-    char * pchBase;
+    mm_array_ptr<char> pch = NULL;
+    mm_array_ptr<char> pchBase = NULL;
     unsigned long ulLen;
     unsigned cWords = 0;
     unsigned cLetters;
@@ -275,7 +278,7 @@ void ReadDict(char *pchFile) {
     if (stat(pchFile, &statBuf)) Fatal("Cannot stat dictionary\n", 0);
 
     ulLen = statBuf.st_size + 2 * (unsigned long)MAXWORDS;
-    pchBase = pchDictionary = (char *)malloc(ulLen);
+    pchBase = pchDictionary = mm_array_alloc<char>(sizeof(char) * ulLen);
 
     if(pchDictionary == NULL)
 	Fatal("Unable to allocate memory for dictionary\n", 0);
@@ -364,9 +367,7 @@ void BuildMask(char * pchPhrase) {
 
 PWord
 NewWord(void) {
-    PWord pw;
-
-    pw = (Word *)malloc(sizeof(Word));
+    PWord pw = mm_alloc<Word>(sizeof(Word));
     if (pw == NULL)
         Fatal("Out of memory after %d candidates\n", cpwCand);
     return pw;
@@ -377,15 +378,15 @@ NewWord(void) {
  * We would normally just use printf, but the string being printed is
  * is a huge pointer (on an IBM PC), so special care must be taken.
  */
-void wprint(char * pch) {
-    printf("%s ", pch);
+void wprint(mm_array_ptr<char> pch) {
+    printf("%s ", _getptr_mm_array<char>(pch));
 }
 
 PWord NextWord(void);
 
 /* NextWord -- get another candidate entry, creating if necessary */
 PWord NextWord(void) {
-    PWord pw;
+    PWord pw = NULL;
     if (cpwCand >= MAXCAND)
 	Fatal("Too many candidates\n", 0);
     pw = apwCand[cpwCand++];
@@ -398,11 +399,11 @@ PWord NextWord(void) {
 /* BuildWord -- build a Word structure from an ASCII word
  * If the word does not fit, then do nothing.
  */
-void BuildWord(char * pchWord) {
+void BuildWord(mm_array_ptr<char> pchWord) {
     unsigned char cchFrequency[ALPHABET];
     int i;
-    char * pch = pchWord;
-    PWord pw;
+    mm_array_ptr<char> pch = pchWord;
+    PWord pw = NULL;
     int cchLength = 0;
 
     bzero(cchFrequency, sizeof(unsigned char)*ALPHABET);
@@ -440,7 +441,7 @@ void BuildWord(char * pchWord) {
 /* AddWords -- build the list of candidates */
 void
 AddWords(void) {
-    char * pch = pchDictionary;     /* walk through the dictionary */
+    mm_array_ptr<char> pch = pchDictionary;     /* walk through the dictionary */
 
     cpwCand = 0;
 
@@ -458,7 +459,7 @@ void DumpCandidates(void) {
     unsigned u;
 
     for (u = 0; u < cpwCand; u++)
-        printf(StringFormat, apwCand[u]->pchWord, (u % 4 == 3) ? '\n' : ' ');
+        printf(StringFormat, _getptr_mm_array<char>(apwCand[u]->pchWord), (u % 4 == 3) ? '\n' : ' ');
     printf("\n");
 }
 
@@ -504,7 +505,7 @@ void
 FindAnagram(Quad * pqMask, PPWord ppwStart, int iLetter)
 {
     Quad aqNext[MAX_QUADS];
-    register PWord pw;
+    register PWord pw = NULL;
     Quad qMask;
     unsigned iq;
     PPWord ppwEnd = &apwCand[0];
