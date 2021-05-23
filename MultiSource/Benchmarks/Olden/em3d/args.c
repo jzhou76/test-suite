@@ -31,7 +31,7 @@ void dealwithargs(int argc, char *argv[])
 {
 #ifdef TORONTO
   if (argc > 4)
-    NumNodes = atoi(argv[4]);    
+    NumNodes = atoi(argv[4]);
   else
     NumNodes = 1;
 #else
@@ -41,7 +41,7 @@ void dealwithargs(int argc, char *argv[])
   else DebugFlag = 0;
 
   if (argc > 4)
-    __NumNodes = atoi(argv[4]);    
+    __NumNodes = atoi(argv[4]);
   else
     __NumNodes = 4;
 #endif

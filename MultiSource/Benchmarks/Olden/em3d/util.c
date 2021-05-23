@@ -33,7 +33,7 @@ int gen_number(int range)
 int gen_signed_number(int range)
 {
   int temp;
- 
+
   temp = lrand48() % (2*range);  /* 0..2*range-1 */
   temp =  temp-(range);
   if (temp >= 0) temp++;

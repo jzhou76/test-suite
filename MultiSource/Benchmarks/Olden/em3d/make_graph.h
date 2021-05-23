@@ -9,5 +9,5 @@
 
 /* initialize graph returns a structure with pointers to lists of e and h
  * nodes.
- */ 
+ */
 graph_t *initialize_graph();

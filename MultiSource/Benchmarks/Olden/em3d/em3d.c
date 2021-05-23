@@ -7,7 +7,7 @@ register node_t *nodelist;
 {
   register int i;
   register node_t *localnode;
-  
+
   for (; nodelist; ) {
     register double cur_value;
     register int from_count ;
@@ -16,7 +16,7 @@ register node_t *nodelist;
     register double value;
     /*register double *coeffs;*/
     /*register node_t **from_nodes;*/
-    
+
     localnode = nodelist;
     cur_value = *localnode->value;
     from_count = localnode->from_count-1;
@@ -28,30 +28,30 @@ register node_t *nodelist;
         value = *other_value;
       else
         value = 0;
-      
+
       cur_value -= coeff*value;
       other_value = localnode->from_values[i+1];
       coeff = localnode->coeffs[i];
-      
+
       if (other_value)
         value = *other_value;
       else
         value = 0;
-      
+
       cur_value -= coeff*value;
-      
+
       /*chatting("from %d, coeff %f, value %f\n",count,coeff,value);*/
     }
 
     if (i==from_count)  {
       other_value = localnode->from_values[i];
       coeff = localnode->coeffs[i];
-      
+
       if (other_value)
         value = *other_value;
       else
         value = 0;
-      
+
       cur_value -= coeff*value;
     }
     *localnode->value = cur_value;

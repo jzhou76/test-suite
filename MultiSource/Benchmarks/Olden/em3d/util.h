@@ -2,7 +2,7 @@
 
 /* util.h
  *
- * headers for randomizing utilities 
+ * headers for randomizing utilities
  *
  * By: Martin C. Carlisle
  * Date: Feb 23, 1994

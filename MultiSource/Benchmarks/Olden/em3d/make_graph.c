@@ -33,13 +33,13 @@ void fill_table(node_t **node_table, double *values, int size, int procname)
 {
   node_t *cur_node, *prev_node;
   int i;
-  
+
   prev_node = (node_t *)malloc(sizeof(node_t));
   node_table[0] = prev_node;
   *values = gen_uniform_double();
   prev_node->value = values++;
   prev_node->from_count = 0;
-  
+
   /* Now we fill the node_table with allocated nodes */
   for (i=1; i<size; i++) {
     cur_node = (node_t *)malloc(sizeof(node_t));
@@ -117,11 +117,11 @@ void make_neighbors(node_t *nodelist, node_t **table[], int tablesz,
 
 void update_from_coeffs(node_t *nodelist) {
   node_t *cur_node;
-  
-  /* Setup coefficient and from_nodes vectors for h nodes */  
+
+  /* Setup coefficient and from_nodes vectors for h nodes */
   for (cur_node = nodelist; cur_node; cur_node=cur_node->next) {
     int from_count = cur_node->from_count;
-    
+
     if (from_count < 1) {
       chatting("Help! no from count (from_count=%d) \n", from_count);
       cur_node->from_values = (double **)malloc(20 * sizeof(double *));
@@ -156,7 +156,7 @@ void fill_from_fields(node_t *nodelist, int degree) {
         otherlist = other_node->from_values;
         /*chatting("No from list!! 0x%p\n",otherlist);*/
       }
-      
+
       otherlist[count] = value;                 /* <------ 42% store penalty */
 
       /* <----- 42+6.5% store penalty */
@@ -217,7 +217,7 @@ void make_all_neighbors(table_t *table,int groupname) {
 		 d_nodes,local_p,groupname);
 }
 
-void update_all_from_coeffs(table_t *table, int groupname)    
+void update_all_from_coeffs(table_t *table, int groupname)
 {
   node_t **local_table;
   node_t *first_node;
@@ -261,7 +261,7 @@ void localize(table_t *table, int groupname)
   first_node = local_table[0];
   localize_local(first_node);
 }
-  
+
 void clear_nummiss(table_t *table, int groupname)
 {
   NumMisses = 0;
@@ -317,7 +317,7 @@ graph_t *initialize_graph() {
     node_t *local_node_r = local_table[0];
 
     retval->e_nodes[i] = local_node_r;
-      
+
     local_table = table->h_table[i*blocksize];
     local_node_r = local_table[0];
     retval->h_nodes[i] = local_node_r;
@@ -329,7 +329,7 @@ graph_t *initialize_graph() {
       local_table = table->e_table[i*blocksize+j];
       local_node_r = local_table[0];
       local_node_l->next = local_node_r;
-      
+
       local_table = table->h_table[i*blocksize+j-1];
       local_node_l = local_table[(n_nodes/PROCS)-1];
       local_table = table->h_table[i*blocksize+j];
@@ -337,7 +337,7 @@ graph_t *initialize_graph() {
       local_node_l->next = local_node_r;
     }
   }
-  
+
   chatting("Clearing NumMisses\n");
   do_all(table,0,PROCS,clear_nummiss,groupsize);
   chatting("Returning\n");
