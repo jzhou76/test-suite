@@ -99,9 +99,9 @@ treeptr old_main() {
     int processor= i/(32/NumNodes);
 
     points=uniform_testdata(processor, nbody/32, i+1);
-    
+
     t->bodytab[i]=points.list;
-    if (prev) 
+    if (prev)
        Next(prev)=points.list;
     prev = points.tail;
     ADDV(cmr,cmr,points.cmr);
@@ -133,7 +133,7 @@ treeptr old_main() {
     ptrper[tmp] = p;
     Proc(p) = tmp;
   }
-  for (tmp=0; tmp<NumNodes; tmp++) 
+  for (tmp=0; tmp<NumNodes; tmp++)
     {
      chatting("Bodies per %d = %d\n",tmp ,bodiesper[tmp]);
      t->bodiesperproc[tmp]=ptrper[tmp];
@@ -142,7 +142,7 @@ treeptr old_main() {
 #ifdef DEBUG
   { int i=0;
     bodyptr p = t->bodytab[0];
-  
+
     for (; i < nbody; i++, p=Next(p))
       printf("%d -- %f %f %f\n", i, Pos(p)[0], Pos(p)[1],
 	     Pos(p)[2]);
@@ -168,7 +168,7 @@ treeptr old_main() {
 #ifdef DEBUG
   { int i=0;
     bodyptr p = t->bodytab[0];
-  
+
     for (; i < nbody; i++, p=Next(p))
       printf("%d -- %f %f %f\n", i, Pos(p)[0], Pos(p)[1],
 	     Pos(p)[2]);
@@ -317,12 +317,12 @@ void freetree1(nodeptr n)
   freetree(n);
 }
 
-  
+
 void freetree(nodeptr n)
 {
   register nodeptr r;
   register int i;
-  
+
   /*NOTEST();*/
   if ((n == NULL) || (Type(n) == BODY))
     return;
@@ -356,7 +356,7 @@ void my_free(nodeptr n)
     cp_free_list = n;
   }
 }
-    
+
 
 bodyptr ubody_alloc(int p)
 { register bodyptr tmp;
@@ -368,7 +368,7 @@ bodyptr ubody_alloc(int p)
   Proc_Next(tmp) = NULL;
   New_Proc(tmp) = p;
   return tmp;
-  
+
 }
 
 
@@ -380,7 +380,7 @@ cellptr cell_alloc(int p)
     tmp = (cellptr) cp_free_list;
     cp_free_list = (nodeptr) FL_Next((cellptr) cp_free_list);
   }
-  else 
+  else
     {
       tmp = (cellptr)malloc(sizeof(cell));
     }
@@ -431,7 +431,7 @@ datapoints uniform_testdata(int proc, int nbodyx, int seedfactor)
     temp = pow(t1,	                        /*   pick r in struct units */
 			 -2.0/3.0) - 1;
     r = 1 / sqrt(temp);
-    
+
     coeff = 4.0; /* exp(log(nbodyx/DENSITY)/3.0); */
     for (k=0; k < NDIM; k++) {
       seed = my_rand(seed);
@@ -450,7 +450,7 @@ datapoints uniform_testdata(int proc, int nbodyx, int seedfactor)
 
     /*   pick scaled velocity   */
     rad = vsc*v;
-    
+
     do {					/* pick point in NDIM-space */
       for (k = 0; k < NDIM; k++)	{	/* loop over dimensions   */
 	seed = my_rand(seed);
@@ -469,7 +469,7 @@ datapoints uniform_testdata(int proc, int nbodyx, int seedfactor)
   retval.tail = prev;
 
   RETEST();
-  
+
   return retval;
 }
 /*
@@ -633,7 +633,7 @@ void vp(bodyptr q, int nstep)
   RETEST();
 }
 
-  
+
 /*
  */
 void gravstep(real rsize, nodeptr rt, bodyptr p, int nstep, real dthf)
@@ -699,7 +699,7 @@ hgstruct gravsub(nodeptr p, hgstruct hg)
     phiquad = 5.0 * phiquad / drsq;         /*   save for acceleration  */
     MULVS(ai, dr, phiquad);                 /*   components of acc.     */
     SUBV(hg.acc0, hg.acc0, ai);             /*   increment              */
-    MULVS(quaddr, quaddr, dr5inv);   
+    MULVS(quaddr, quaddr, dr5inv);
     SUBV(hg.acc0, hg.acc0, quaddr);         /*   acceleration           */
 #endif
   }
@@ -713,8 +713,8 @@ hgstruct gravsub(nodeptr p, hgstruct hg)
 
 /*
  * WALKSUB: recursive routine to do hackwalk operation.
- * p: pointer into body-tree 
- * dsq: size of box squared 
+ * p: pointer into body-tree
+ * dsq: size of box squared
  */
 
 
@@ -722,8 +722,8 @@ hgstruct gravsub(nodeptr p, hgstruct hg)
 /*
  * SUBDIVP: decide if a node should be opened.
  * Side effects: sets pmem, dr, and drsq.
- * p: body/cell to be tested 
- * dsq: size of cell squared 
+ * p: body/cell to be tested
+ * dsq: size of cell squared
  */
 
  bool subdivp(nodeptr p, real dsq, real tolsq, hgstruct hg)
@@ -737,7 +737,7 @@ hgstruct gravsub(nodeptr p, hgstruct hg)
   if (Type(local_p) == BODY) /*<-- 27% load penalty */                  /* at tip of tree? */
     return (FALSE);                           /*   then cant subdivide */
 
-  SUBV(dr, Pos(local_p), hg.pos0); /*<-- 13% load penalty */              /* compute displacement  */   
+  SUBV(dr, Pos(local_p), hg.pos0); /*<-- 13% load penalty */              /* compute displacement  */
   DOTVP(drsq, dr, dr); /* <-- 8.6% load penalty */                       /* and find dist squared    */
 
 
@@ -785,7 +785,7 @@ void dis_number (nodeptr n);
  */
 
 nodeptr maketree(bodyptr btab, int nb, treeptr t, int nsteps, int proc)
-{  
+{
   register bodyptr q;
   int tmp;
   nodeptr node1;
@@ -821,17 +821,17 @@ nodeptr maketree(bodyptr btab, int nb, treeptr t, int nsteps, int proc)
 
   return Root(t);
 }
-  
 
- 
+
+
 
 /*
  * New EXPANDBOX: enlarge cubical "box", salvaging existing tree structure.
- * p - body to be loaded 
- * t - tree 
+ * p - body to be loaded
+ * t - tree
  */
 
-void expandbox(bodyptr p, treeptr t, int nsteps, int proc)       
+void expandbox(bodyptr p, treeptr t, int nsteps, int proc)
 {
     icstruct ic;
     int k;
@@ -889,10 +889,10 @@ void expandbox(bodyptr p, treeptr t, int nsteps, int proc)
 
 /*
  * New LOADTREE: descend tree and insert particle.
- * p - body to be loaded 
+ * p - body to be loaded
  * xp - integer coordinates of p
  * t - tree
- * l - current level in tree 
+ * l - current level in tree
  */
 
 nodeptr loadtree(bodyptr p, icstruct xpic, nodeptr t, int l, treeptr tr)
@@ -915,8 +915,8 @@ nodeptr loadtree(bodyptr p, icstruct xpic, nodeptr t, int l, treeptr tr)
       /*printtree(t); printtree(p);*/
       i = PID(t);
       c = (cellptr) cell_alloc(i);
-      si = subindex((bodyptr) t, tr, l); 
-     
+      si = subindex((bodyptr) t, tr, l);
+
       Subp(c)[si] = (nodeptr) t;        	/*     put body in cell     */
       t = (nodeptr) c;	        	/*     link cell in tree    */
     }
@@ -997,7 +997,7 @@ icstruct intcoord(bodyptr p, treeptr t)
     pos[0] = Pos(p)[0];
     pos[1] = Pos(p)[1];
     pos[2] = Pos(p)[2];
- 
+
     /*chatting("Intcoord:%f,%f,%f\n",pos[0],pos[1],pos[2]);*/
 
     xsc = (pos[0] - t->rmin[0]) / rsize;    /*   scale to range [0,1)   */
@@ -1182,10 +1182,10 @@ void printtree(nodeptr n)
 }
 
 void ptree(nodeptr n, int level)
-{ 
+{
   nodeptr r;
-  
-  
+
+
   if (n != NULL) {
     if (Type(n) == BODY) {
       chatting("%2d BODY@%x %f, %f, %f\n", level, n, Pos(n)[0], Pos(n)[1], Pos(n)[2]);
@@ -1200,16 +1200,16 @@ void ptree(nodeptr n, int level)
       }
     }
   }
-  else 
+  else
     printf("%2d NULL TREE\n", level);
 }
 
-      
+
 
 typedef struct {
   int bits;
   int split;
-  cellptr new; 
+  cellptr new;
   nodeptr non_local[NSUB];
 } dt3_struct;
 
@@ -1224,7 +1224,7 @@ void dis_number (nodeptr n)
 int dis2_number(nodeptr n, int prev_bodies, int tnperproc)
 {
 
-  if (n == NULL) 
+  if (n == NULL)
     return prev_bodies;
 
   else if (Type(n) == BODY) {
@@ -1245,5 +1245,5 @@ int dis2_number(nodeptr n, int prev_bodies, int tnperproc)
     RETEST();
     return prev_bodies;
   }
-}    
+}
 

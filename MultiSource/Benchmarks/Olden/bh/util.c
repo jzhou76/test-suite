@@ -19,7 +19,7 @@ void exit(int);
  */
 double my_rand(double seed)
 {
-    double	t = A*seed  + 1; 
+    double	t = A*seed  + 1;
     double floor();
 
 

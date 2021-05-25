@@ -127,7 +127,7 @@ typedef struct bnode {
 
 #define NSUB (1 << NDIM)        /* subcells per cell */
 
-typedef struct cnode *cellptr; 
+typedef struct cnode *cellptr;
 
 typedef struct cnode {
     short type;
@@ -152,7 +152,7 @@ typedef struct cnode {
 #define FL_Next(x) ((x)->next)
 
 typedef struct {
-  real rmin[3];               
+  real rmin[3];
   real rsize;
   nodeptr root;
   bodyptr bodytab[MAX_NUM_NODES];
@@ -186,8 +186,8 @@ typedef struct {
 typedef struct {
   double v[NDIM];
 } vecstruct;
-    
-
+
+
 /*
  * ROOT: origin of tree; declared as nodeptr for tree with only 1 body.
  */

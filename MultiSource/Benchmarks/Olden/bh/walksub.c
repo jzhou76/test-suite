@@ -1,4 +1,4 @@
-#define global 
+#define global
 #include "defs.h"
 
 typedef struct {
@@ -10,8 +10,8 @@ typedef struct {
 
 /*
  * WALKSUB: recursive routine to do hackwalk operation.
- * p: pointer into body-tree 
- * dsq: size of box squared 
+ * p: pointer into body-tree
+ * dsq: size of box squared
  */
 extern bool subdivp(nodeptr p, real dsq, real tolsq, hgstruct hg);
 hgstruct walksub(nodeptr p, real dsq, real tolsq, hgstruct hg, int level);
