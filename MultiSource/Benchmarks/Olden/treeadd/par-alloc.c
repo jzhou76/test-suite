@@ -9,7 +9,9 @@
 #endif
 
 #include "tree.h"
+#if 0
 extern void *malloc(unsigned);
+#endif
 
 tree_p TreeAlloc (int level, int lo, int proc) {
   if (level == 0)
