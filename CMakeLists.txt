@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4.3)
 
 include(CheckSymbolExists)
 
-project(test-suite C CXX)
+project(test-suite C)
 
 # The test-suite is designed to be built in release mode anyway and
 # falls over unless -DNDEBUG is set.
