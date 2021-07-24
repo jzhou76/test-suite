@@ -13,7 +13,6 @@
 
 typedef struct tree {
     int		val;
-    /* struct tree *left, *right; */
     mm_ptr<struct tree> left;
     mm_ptr<struct tree> right;
 } tree_t;
@@ -22,10 +21,3 @@ typedef mm_ptr<tree_t> tree_p;
 
 extern tree_p TreeAlloc (int level, int lo, int hi);
 int TreeAdd (tree_p t);
-
-
-
-
-
-
-

@@ -52,7 +52,7 @@ int main (int argc, char *argv[])
 	     level, __NumNodes);
 #endif
     /* only processor 0 will continue here. */
-    chatting("About to enter TreeAlloc\n"); 
+    chatting("About to enter TreeAlloc\n");
 #ifndef TORONTO
     CMMD_node_timer_start(0);
 #endif
@@ -66,8 +66,8 @@ int main (int argc, char *argv[])
 #ifndef TORONTO
     CMMD_node_timer_stop(0);
 #endif
-    chatting("About to enter TreeAdd\n"); 
-    
+    chatting("About to enter TreeAdd\n");
+
 #ifndef PLAIN
     ClearAllStats();
 #endif
@@ -103,7 +103,7 @@ int TreeAdd (mm_ptr<tree_t> t)
     return 0;
   }
   else {
-#ifdef FUTURES    
+#ifdef FUTURES
     future_cell_int leftval;
     int rightval;
     mm_ptr<tree_t> tleft = NULL, tright = NULL;
@@ -132,7 +132,7 @@ int TreeAdd (mm_ptr<tree_t> t)
     tright = t->right;          /* <---- 11.4% load penalty */
     rightval = TreeAdd(tright);
     /*chatting("after touch\n");*/
-    value = t->val;             
+    value = t->val;
     /*chatting("returning from treeadd %d\n",*/
 	     /*leftval.value + rightval.value + value);*/
     return leftval + rightval + value;
