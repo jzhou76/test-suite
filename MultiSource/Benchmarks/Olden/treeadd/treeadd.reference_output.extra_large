@@ -1,5 +1,5 @@
-Treeadd with 28 levels on 4 processors 
+Treeadd with 27 levels on 4 processors 
 About to enter TreeAlloc
 About to enter TreeAdd
-Received result of 268435455
+Received result of 134217727
 exit 0
