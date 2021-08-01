@@ -127,6 +127,7 @@ int TreeAdd (mm_ptr<tree_t> t)
     mm_ptr<tree_t> tleft = NULL, tright = NULL;
     int value;
 
+    mm_checked<tree_t>(t);
     tleft = t->left;            /* <---- 57% load penalty */
     leftval = TreeAdd(tleft);
     tright = t->right;          /* <---- 11.4% load penalty */
