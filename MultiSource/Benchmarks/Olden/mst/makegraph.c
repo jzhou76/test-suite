@@ -64,7 +64,7 @@ static void AddEdges(int count1, Graph retval, int numproc,
               offset = i % perproc;
               dest = ((helper[pn])+offset);
               hash = tmp->edgehash;
-              HashInsert((void *) dist,(unsigned int) _getptr_mm<struct vert_st>(dest),hash);
+              HashInsert((void *) dist,(unsigned int) _GETPTR(struct vert_st, dest),hash);
               /*assert(4, HashLookup((unsigned int) dest,hash) == (void*) dist);*/
             }
         } /* for i... */

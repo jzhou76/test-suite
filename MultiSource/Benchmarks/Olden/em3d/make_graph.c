@@ -25,7 +25,7 @@ int local_p;
 node_ptr_arr make_table(int size, int procname) {
   node_ptr_arr retval =
       mm_array_alloc<mm_ptr<node_t>>(size*sizeof(mm_ptr<node_t>));
-  assert(_getptr_mm_array<mm_ptr<node_t>>(retval));
+  assert(_GETARRAYPTR(mm_ptr<node_t>, retval));
   return retval;
 }
 

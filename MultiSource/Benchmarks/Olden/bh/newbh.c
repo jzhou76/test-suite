@@ -1191,12 +1191,12 @@ void ptree(mm_ptr<node> n, int level)
 
   if (n != NULL) {
     if (Type(n) == BODY) {
-      chatting("%2d BODY@%x %f, %f, %f\n", level, _getptr_mm<node>(n), Pos(n)[0], Pos(n)[1], Pos(n)[2]);
+      chatting("%2d BODY@%x %f, %f, %f\n", level, _GETPTR(node, n), Pos(n)[0], Pos(n)[1], Pos(n)[2]);
     }
     else /* CELL */ {
       int i;
 
-      chatting("%2d CELL@%x %f, %f, %f\n", level, _getptr_mm<node>(n), Pos(n)[0], Pos(n)[1], Pos(n)[2]);
+      chatting("%2d CELL@%x %f, %f, %f\n", level, _GETPTR(node, n), Pos(n)[0], Pos(n)[1], Pos(n)[2]);
       for (i = 0; i < NSUB; i++) {
 	r = Subp((mm_ptr<cell>) n)[i];
 	ptree(r, level+1);

@@ -30,7 +30,7 @@ static BlueReturn BlueRule(Vertex inserted, Vertex vlist)
   retval.vert = vlist;
   retval.dist = vlist->mindist;
   hash = vlist->edgehash;
-  dist = (int) HashLookup((unsigned int) _getptr_mm_array<struct vert_st>(inserted), hash);
+  dist = (int) HashLookup((unsigned int) _GETARRAYPTR(struct vert_st, inserted), hash);
   if (dist) 
     {
       if (dist<retval.dist) 
@@ -57,7 +57,7 @@ static BlueReturn BlueRule(Vertex inserted, Vertex vlist)
         {
           hash = tmp->edgehash; /* <------  6% miss in tmp->edgehash */ 
           dist2 = tmp->mindist;
-          dist = (int) HashLookup((unsigned int) _getptr_mm<struct vert_st>(inserted), hash);
+          dist = (int) HashLookup((unsigned int) _GETPTR(struct vert_st, inserted), hash);
           if (dist) 
             {
               if (dist<dist2) 
