@@ -1,1 +1,4 @@
-/home/jie/projects/checkedc/tests/test-suite-baseline/MultiSource/Benchmarks/Olden/perimeter/perimeter.reference_output.extra_large
+Perimeter with 100 levels on 1 processors
+# of leaves is 35917792
+perimeter is 0
+exit 0

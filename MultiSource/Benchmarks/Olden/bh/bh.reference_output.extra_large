@@ -1,1 +1,33 @@
-/home/jie/projects/checkedc/tests/test-suite-baseline/MultiSource/Benchmarks/Olden/bh/bh.reference_output.extra_large
+nbody = 200000, numnodes = 30
+bodies created 
+Bodies per 0 = 6239
+Bodies per 1 = 6152
+Bodies per 2 = 6370
+Bodies per 3 = 6391
+Bodies per 4 = 6263
+Bodies per 5 = 6179
+Bodies per 6 = 6216
+Bodies per 7 = 6258
+Bodies per 8 = 6151
+Bodies per 9 = 6315
+Bodies per 10 = 6253
+Bodies per 11 = 6213
+Bodies per 12 = 6238
+Bodies per 13 = 6265
+Bodies per 14 = 6329
+Bodies per 15 = 6295
+Bodies per 16 = 6211
+Bodies per 17 = 6310
+Bodies per 18 = 6226
+Bodies per 19 = 6240
+Bodies per 20 = 6253
+Bodies per 21 = 6183
+Bodies per 22 = 6296
+Bodies per 23 = 6292
+Bodies per 24 = 6199
+Bodies per 25 = 6350
+Bodies per 26 = 6221
+Bodies per 27 = 6288
+Bodies per 28 = 6253
+Bodies per 29 = 6198
+exit 0
