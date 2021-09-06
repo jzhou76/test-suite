@@ -55,7 +55,7 @@ void fill_table(node_ptr_arr node_table, mm_array_ptr<double > values,
   cur_node->next = NULL;
 }
 
-void make_neighbors(node_ptr nodelist, node_ptr_arr *table, int tablesz,
+void make_neighbors(node_ptr nodelist, mm_array_ptr<node_ptr_arr> table, int tablesz,
 		    int degree, int percent_local, int id)
 {
   node_ptr cur_node = NULL;
@@ -202,7 +202,7 @@ void make_tables(table_ptr table,int groupname) {
 void make_all_neighbors(table_ptr table,int groupname) {
   node_ptr first_node = NULL;
   node_ptr_arr local_table = NULL;
-  node_ptr_arr *local_table_array = NULL;
+  mm_array_ptr<node_ptr_arr> local_table_array = NULL;
 
   init_random(SEED2*groupname);
   /* We expect table to be remote */
